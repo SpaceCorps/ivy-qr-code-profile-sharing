@@ -49,8 +49,6 @@ public class ProfileApp : ViewBase
         {
             if (await onSubmit())
             {
-                try
-                {
                     // Generate vCard QR code for contact sharing
                     qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
                         profile.Value.FirstName,
@@ -62,12 +60,6 @@ public class ProfileApp : ViewBase
                         8
                     );
                     profileSubmitted.Value = true;
-                }
-                catch (Exception ex)
-                {
-                    // Handle QR code generation error
-                    Console.WriteLine($"Error generating QR code: {ex.Message}");
-                }
             }
         }
 
