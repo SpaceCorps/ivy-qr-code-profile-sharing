@@ -17,6 +17,14 @@ public class ProfileApp : ViewBase
 
     public override object? Build()
     {
+        // Підключення CSS стилів через data URI для вирішення проблеми зі скролінгом
+        var cssContent = System.IO.File.ReadAllText("Assets/scrolling-fix.css");
+        var cssStyles = Text.Html($@"
+            <style>
+                {cssContent}
+            </style>
+        ");
+
         var profile = UseState(() => new ProfileModel("", "", "", null, null, null));
         var qrCodeService = new QrCodeService();
         var qrCodeBase64 = UseState<string>("");
@@ -128,9 +136,12 @@ public class ProfileApp : ViewBase
                     | Text.Html("<div style='font-size: 4rem; opacity: 0.3;'>📱</div>")
             ).Title("Instructions");
 
-        return new ResizeablePanelGroup(
-            new ResizeablePanel(70, sidebarContent), // Form panel - 40% width, resizable
-            new ResizeablePanel(30, mainContent)     // QR Code panel - 60% width, resizable
-        ).Horizontal();
+        return Layout.Vertical()
+            | cssStyles
+            | new ResizeablePanelGroup(
+                new ResizeablePanel(70, sidebarContent), // Form panel - 40% width, resizable
+                new ResizeablePanel(30, mainContent)     // QR Code panel - 60% width, resizable
+            ).Horizontal();
+
     }
 }

@@ -1,0 +1,123 @@
+/* CSS для вирішення проблеми зі скролінгом при збільшенні масштабу */
+
+/* Глобальні налаштування для HTML та body */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+}
+
+/* Застосування box-sizing до всіх елементів */
+*, *::before, *::after {
+    box-sizing: border-box !important;
+}
+
+/* Налаштування для основного контейнера додатку */
+.ivy-app, 
+[data-ivy-app],
+main {
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: auto !important;
+    position: relative !important;
+    display: block !important;
+}
+
+/* Налаштування для ResizeablePanelGroup */
+.resizeable-panel-group {
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: auto !important;
+    display: flex !important;
+    position: relative !important;
+}
+
+/* Налаштування для окремих панелей */
+.resizeable-panel {
+    overflow: auto !important;
+    max-height: 100vh !important;
+    min-height: 0 !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Налаштування для карток */
+.card, 
+[class*="card"] {
+    overflow: auto !important;
+    max-height: 100% !important;
+    position: relative !important;
+}
+
+/* Налаштування для контейнерів з вертикальним layout */
+.vertical-layout,
+[class*="vertical"] {
+    overflow: auto !important;
+    max-height: 100% !important;
+}
+
+/* Виправлення для збільшеного масштабу */
+@media screen and (min-resolution: 1.5dppx) {
+    .resizeable-panel {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+    
+    .resizeable-panel-group {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+}
+
+/* Додаткові налаштування для мобільних пристроїв */
+@media (max-width: 768px) {
+    .resizeable-panel-group {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+    
+    .resizeable-panel {
+        width: 100% !important;
+        max-height: none !important;
+        min-height: 50vh !important;
+    }
+}
+
+/* Налаштування для прокрутки з плавністю */
+html {
+    scroll-behavior: smooth !important;
+}
+
+/* Виправлення для браузерів з різними движками */
+.webkit-scrollbar {
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* Додаткові налаштування для Firefox */
+@-moz-document url-prefix() {
+    .resizeable-panel {
+        overflow: auto !important;
+    }
+}
+
+/* Налаштування для Edge/Chromium */
+@supports (-ms-ime-align: auto) {
+    .resizeable-panel-group {
+        overflow: auto !important;
+    }
+}
+
+/* Виправлення для високих DPI екранів */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .resizeable-panel {
+        overflow: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
