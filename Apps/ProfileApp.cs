@@ -85,7 +85,7 @@ public class ProfileApp : ViewBase
                 | (Layout.Horizontal().Align(Align.Center)
                 | new DemoBox(
                     Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
-            ).BorderStyle(BorderStyle.None).Width(Size.Units(60)).Height(Size.Units(60)))
+            ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70)))
                 | (Layout.Horizontal().Align(Align.Center)
                     | new Button("Generate New QR Code").HandleClick(new Action(() =>
                     {
