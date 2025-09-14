@@ -1,4 +1,5 @@
 using IvyQrCodeProfileSharing.Apps;
+
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
 var server = new Server();
 #if DEBUG

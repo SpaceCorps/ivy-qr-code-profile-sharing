@@ -1,3 +1,5 @@
+using IvyQrCodeProfileSharing.Services;
+
 namespace IvyQrCodeProfileSharing.Apps;
 
 [App(icon: Icons.User, title: "Profile Creator")]
@@ -16,6 +18,10 @@ public class ProfileApp : ViewBase
     public override object? Build()
     {
         var profile = UseState(() => new ProfileModel("", "", "", null, null, null));
+        var qrCodeService = new QrCodeService();
+        var qrCodeBase64 = UseState<string>("");
+        var profileSubmitted = UseState<bool>(false);
+        
         var formBuilder = profile.ToForm()
             .Required(m => m.FirstName, m => m.LastName, m => m.Email)
             .Label(m => m.FirstName, "First Name")
@@ -41,9 +47,30 @@ public class ProfileApp : ViewBase
         {
             if (await onSubmit())
             {
-                // Form data is automatically copied to profile.Value
-                // You can access the client service here if needed
-                // For now, we'll just show a success message
+                // Generate profile data as JSON for QR code
+                var profileData = new
+                {
+                    firstName = profile.Value.FirstName,
+                    lastName = profile.Value.LastName,
+                    email = profile.Value.Email,
+                    phone = profile.Value.Phone,
+                    linkedin = profile.Value.LinkedIn,
+                    github = profile.Value.GitHub,
+                    generatedAt = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+                };
+                
+                var profileJson = System.Text.Json.JsonSerializer.Serialize(profileData, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                
+                try
+                {
+                    qrCodeBase64.Value = qrCodeService.GenerateQrCodeAsBase64(profileJson, 8);
+                    profileSubmitted.Value = true;
+                }
+                catch (Exception ex)
+                {
+                    // Handle QR code generation error
+                    Console.WriteLine($"Error generating QR code: {ex.Message}");
+                }
             }
         }
 
@@ -69,6 +96,18 @@ public class ProfileApp : ViewBase
                         | (profile.Value.LinkedIn != null ? Text.Block($"LinkedIn: {profile.Value.LinkedIn}") : null)
                         | (profile.Value.GitHub != null ? Text.Block($"GitHub: {profile.Value.GitHub}") : null)
                     ).Title("Preview")
+                    : null)
+                | (profileSubmitted.Value && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
+                    new Card(
+                        Layout.Vertical().Gap(6)
+                        | Text.H3("Your QR Code")
+                        | Text.Block("Scan this QR code to share your profile information:")
+                        | Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" width=\"250\" height=\"250\" style=\"display: block; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;\" />")
+                        | new Button("Generate New QR Code").HandleClick(new Action(() => {
+                            qrCodeBase64.Value = "";
+                            profileSubmitted.Value = false;
+                        }).ToEventHandler<Button>())
+                    ).Title("QR Code")
                     : null)
             )
             .Width(Size.Units(120).Max(600))
