@@ -90,7 +90,7 @@ public class ProfileApp : ViewBase
                 | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
                     .Loading(loading).Disabled(loading)
                 | validationView
-        );
+        ).Height(Size.Units(150));
 
         // Main content - QR Code display
         var mainContent = profileSubmitted.Value && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
@@ -99,15 +99,15 @@ public class ProfileApp : ViewBase
                 | Text.H2("Your QR Code")
                 | Text.Block("Scan this QR code with your phone to automatically add this contact to your contacts:")
                 | Layout.Center()
-                    | Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" width=\"300\" height=\"300\" style=\"display: block; margin: 0 auto; border: 2px solid #ddd; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);\" />")
-                | Layout.Horizontal().Gap(4)
+                    | Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" width=\"100\" height=\"100\" style=\"display: block; margin: 0 auto; border: 2px solid #ddd; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);\" />")
+                | (Layout.Horizontal().Align(Align.Center)
                     | new Button("Generate New QR Code").HandleClick(new Action(() =>
                     {
                         qrCodeBase64.Value = "";
                         profileSubmitted.Value = false;
-                    }).ToEventHandler<Button>())
+                    }).ToEventHandler<Button>()))
 
-            ).Title("QR Code")
+            ).Height(Size.Units(150))
             : new Card(
                 Layout.Vertical().Gap(6).Padding(2)
                 | Layout.Center()
@@ -116,7 +116,7 @@ public class ProfileApp : ViewBase
                 | Text.Block("Once you submit the form, your QR code will appear here in the main content area.")
                 | Layout.Center()
                     | Text.Html("<div style='font-size: 4rem; opacity: 0.3;'>📱</div>")
-            ).Title("Instructions");
+            ).Height(Size.Units(150));
 
         return Layout.Vertical()
             | cssStyles
