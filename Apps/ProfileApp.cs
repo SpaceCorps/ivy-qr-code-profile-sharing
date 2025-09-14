@@ -75,43 +75,71 @@ public class ProfileApp : ViewBase
             }
         }
 
-        return Layout.Center()
-            | new Card(
+        // Sidebar content - Profile form
+        var sidebarContent = new Card(
+            Layout.Vertical().Gap(6).Padding(2)
+            | new IvyLogo()
+            | Text.H2("Create Your Profile")
+            | Text.Block("Fill in your information to create a shareable profile")
+            | new Separator()
+            | formView
+            | Layout.Horizontal()
+                | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
+                    .Loading(loading).Disabled(loading)
+                | validationView
+            | (profile.Value.FirstName != "" && profile.Value.LastName != "" && profile.Value.Email != "" ?
+                new Card(
+                    Layout.Vertical()
+                    | Text.H3("Profile Preview")
+                    | Text.Block($"Name: {profile.Value.FirstName} {profile.Value.LastName}")
+                    | Text.Block($"Email: {profile.Value.Email}")
+                    | (profile.Value.Phone != null ? Text.Block($"Phone: {profile.Value.Phone}") : null)
+                    | (profile.Value.LinkedIn != null ? Text.Block($"LinkedIn: {profile.Value.LinkedIn}") : null)
+                    | (profile.Value.GitHub != null ? Text.Block($"GitHub: {profile.Value.GitHub}") : null)
+                ).Title("Preview")
+                : null)
+        ).Title("Profile Form");
+
+        // Main content - QR Code display
+        var mainContent = profileSubmitted.Value && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
+            new Card(
                 Layout.Vertical().Gap(6).Padding(2)
-                | new IvyLogo()
-                | Text.H2("Create Your Profile")
-                | Text.Block("Fill in your information to create a shareable profile")
+                | Text.H2("Your QR Code")
+                | Text.Block("Scan this QR code with your phone to automatically add this contact to your contacts:")
+                | Layout.Center()
+                    | Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" width=\"300\" height=\"300\" style=\"display: block; margin: 0 auto; border: 2px solid #ddd; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);\" />")
+                | Layout.Horizontal().Gap(4)
+                    | new Button("Generate New QR Code").HandleClick(new Action(() => {
+                        qrCodeBase64.Value = "";
+                        profileSubmitted.Value = false;
+                    }).ToEventHandler<Button>())
+                    | new Button("Download QR Code").HandleClick(new Action(() => {
+                        // TODO: Implement download functionality
+                    }).ToEventHandler<Button>())
                 | new Separator()
-                | formView
-                | Layout.Horizontal()
-                    | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
-                        .Loading(loading).Disabled(loading)
-                    | validationView
-                | (profile.Value.FirstName != "" && profile.Value.LastName != "" && profile.Value.Email != "" ?
-                    new Card(
-                        Layout.Vertical()
-                        | Text.H3("Profile Preview")
-                        | Text.Block($"Name: {profile.Value.FirstName} {profile.Value.LastName}")
-                        | Text.Block($"Email: {profile.Value.Email}")
-                        | (profile.Value.Phone != null ? Text.Block($"Phone: {profile.Value.Phone}") : null)
-                        | (profile.Value.LinkedIn != null ? Text.Block($"LinkedIn: {profile.Value.LinkedIn}") : null)
-                        | (profile.Value.GitHub != null ? Text.Block($"GitHub: {profile.Value.GitHub}") : null)
-                    ).Title("Preview")
-                    : null)
-                | (profileSubmitted.Value && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
-                    new Card(
-                        Layout.Vertical().Gap(6)
-                        | Text.H3("Your QR Code")
-                        | Text.Block("Scan this QR code with your phone to automatically add this contact:")
-                        | Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" width=\"250\" height=\"250\" style=\"display: block; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;\" />")
-                        | new Button("Generate New QR Code").HandleClick(new Action(() => {
-                            qrCodeBase64.Value = "";
-                            profileSubmitted.Value = false;
-                        }).ToEventHandler<Button>())
-                    ).Title("QR Code")
-                    : null)
-            )
-            .Width(Size.Units(120).Max(600))
-            .Title("Profile Creator");
+                | new Card(
+                    Layout.Vertical()
+                    | Text.H3("Contact Information")
+                    | Text.Block($"Name: {profile.Value.FirstName} {profile.Value.LastName}")
+                    | Text.Block($"Email: {profile.Value.Email}")
+                    | (profile.Value.Phone != null ? Text.Block($"Phone: {profile.Value.Phone}") : null)
+                    | (profile.Value.LinkedIn != null ? Text.Block($"LinkedIn: {profile.Value.LinkedIn}") : null)
+                    | (profile.Value.GitHub != null ? Text.Block($"GitHub: {profile.Value.GitHub}") : null)
+                ).Title("Profile Details")
+            ).Title("QR Code")
+            : new Card(
+                Layout.Vertical().Gap(6).Padding(2)
+                | Layout.Center()
+                    | Text.H2("Welcome to Profile Creator")
+                | Text.Block("Fill out the form in the sidebar to create your shareable profile QR code.")
+                | Text.Block("Once you submit the form, your QR code will appear here in the main content area.")
+                | Layout.Center()
+                    | Text.Html("<div style='font-size: 4rem; opacity: 0.3;'>📱</div>")
+            ).Title("Instructions");
+
+        return new ResizeablePanelGroup(
+            new ResizeablePanel(40, sidebarContent), // Form panel - 40% width, resizable
+            new ResizeablePanel(60, mainContent)     // QR Code panel - 60% width, resizable
+        ).Horizontal();
     }
 }
