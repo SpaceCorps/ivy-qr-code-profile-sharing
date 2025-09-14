@@ -82,8 +82,10 @@ public class ProfileApp : ViewBase
                 Layout.Vertical().Gap(6).Padding(2)
                 | Text.H2("Your QR Code")
                 | Text.Block("Scan this QR code with your phone to automatically add this contact to your contacts:")
-                | Layout.Center()
-                    | Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" width=\"100\" height=\"100\" style=\"display: block; margin: 0 auto; border: 2px solid #ddd; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);\" />")
+                | (Layout.Horizontal().Align(Align.Center)
+                | new DemoBox(
+                    Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
+            ).BorderStyle(BorderStyle.None).Width(Size.Units(60)).Height(Size.Units(60)))
                 | (Layout.Horizontal().Align(Align.Center)
                     | new Button("Generate New QR Code").HandleClick(new Action(() =>
                     {
@@ -102,8 +104,8 @@ public class ProfileApp : ViewBase
 
         return Layout.Vertical().Height(Size.Full())
             | new ResizeablePanelGroup(
-                new ResizeablePanel(70, formContent), // Form panel - 40% width, resizable
-                new ResizeablePanel(30, qrCodeContent)     // QR Code panel - 60% width, resizable
+                new ResizeablePanel(70, formContent), 
+                new ResizeablePanel(30, qrCodeContent)    
             ).Horizontal();
 
     }
