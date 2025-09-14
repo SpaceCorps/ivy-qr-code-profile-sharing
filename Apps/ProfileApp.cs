@@ -138,8 +138,8 @@ public class ProfileApp : ViewBase
             ).Title("Instructions");
 
         return new ResizeablePanelGroup(
-            new ResizeablePanel(40, sidebarContent), // Form panel - 40% width, resizable
-            new ResizeablePanel(60, mainContent)     // QR Code panel - 60% width, resizable
+            new ResizeablePanel(70, sidebarContent), // Form panel - 40% width, resizable
+            new ResizeablePanel(30, mainContent)     // QR Code panel - 60% width, resizable
         ).Horizontal();
     }
 }
