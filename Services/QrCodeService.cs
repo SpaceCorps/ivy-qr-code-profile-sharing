@@ -1,4 +1,5 @@
 using QRCoder;
+using System.Text;
 
 namespace IvyQrCodeProfileSharing.Services;
 
@@ -11,5 +12,68 @@ public class QrCodeService : IQrCodeService
         using var qrCode = new PngByteQRCode(qrCodeData);
         var qrCodeBytes = qrCode.GetGraphic(pixelsPerModule);
         return Convert.ToBase64String(qrCodeBytes);
+    }
+
+    public string GenerateVCardQrCodeAsBase64(string firstName, string lastName, string email, string? phone = null, string? linkedin = null, string? github = null, int pixelsPerModule = 8)
+    {
+        var vCard = GenerateVCard(firstName, lastName, email, phone, linkedin, github);
+        return GenerateQrCodeAsBase64(vCard, pixelsPerModule);
+    }
+
+    private static string GenerateVCard(string firstName, string lastName, string email, string? phone, string? linkedin, string? github)
+    {
+        var vCard = new StringBuilder();
+        
+        // vCard header
+        vCard.AppendLine("BEGIN:VCARD");
+        vCard.AppendLine("VERSION:3.0");
+        
+        // Full name
+        vCard.AppendLine($"FN:{firstName} {lastName}");
+        
+        // Structured name (Last;First;;;)
+        vCard.AppendLine($"N:{lastName};{firstName};;;");
+        
+        // Email
+        vCard.AppendLine($"EMAIL;TYPE=INTERNET:{email}");
+        
+        // Phone (if provided)
+        if (!string.IsNullOrWhiteSpace(phone))
+        {
+            vCard.AppendLine($"TEL;TYPE=CELL:{phone}");
+        }
+        
+        // LinkedIn URL as a URL field
+        if (!string.IsNullOrWhiteSpace(linkedin))
+        {
+            vCard.AppendLine($"URL;TYPE=LinkedIn:{linkedin}");
+        }
+        
+        // GitHub URL as a URL field
+        if (!string.IsNullOrWhiteSpace(github))
+        {
+            vCard.AppendLine($"URL;TYPE=GitHub:{github}");
+        }
+        
+        // Add note with social profiles if they exist
+        var notes = new List<string>();
+        if (!string.IsNullOrWhiteSpace(linkedin))
+        {
+            notes.Add($"LinkedIn: {linkedin}");
+        }
+        if (!string.IsNullOrWhiteSpace(github))
+        {
+            notes.Add($"GitHub: {github}");
+        }
+        
+        if (notes.Count > 0)
+        {
+            vCard.AppendLine($"NOTE:{string.Join(" | ", notes)}");
+        }
+        
+        // vCard footer
+        vCard.AppendLine("END:VCARD");
+        
+        return vCard.ToString();
     }
 }

@@ -47,23 +47,18 @@ public class ProfileApp : ViewBase
         {
             if (await onSubmit())
             {
-                // Generate profile data as JSON for QR code
-                var profileData = new
-                {
-                    firstName = profile.Value.FirstName,
-                    lastName = profile.Value.LastName,
-                    email = profile.Value.Email,
-                    phone = profile.Value.Phone,
-                    linkedin = profile.Value.LinkedIn,
-                    github = profile.Value.GitHub,
-                    generatedAt = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
-                };
-                
-                var profileJson = System.Text.Json.JsonSerializer.Serialize(profileData, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-                
                 try
                 {
-                    qrCodeBase64.Value = qrCodeService.GenerateQrCodeAsBase64(profileJson, 8);
+                    // Generate vCard QR code for contact sharing
+                    qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
+                        profile.Value.FirstName,
+                        profile.Value.LastName,
+                        profile.Value.Email,
+                        profile.Value.Phone,
+                        profile.Value.LinkedIn,
+                        profile.Value.GitHub,
+                        8
+                    );
                     profileSubmitted.Value = true;
                 }
                 catch (Exception ex)
@@ -101,7 +96,7 @@ public class ProfileApp : ViewBase
                     new Card(
                         Layout.Vertical().Gap(6)
                         | Text.H3("Your QR Code")
-                        | Text.Block("Scan this QR code to share your profile information:")
+                        | Text.Block("Scan this QR code with your phone to automatically add this contact:")
                         | Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" width=\"250\" height=\"250\" style=\"display: block; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;\" />")
                         | new Button("Generate New QR Code").HandleClick(new Action(() => {
                             qrCodeBase64.Value = "";
