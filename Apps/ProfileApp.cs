@@ -44,10 +44,6 @@ public class ProfileApp : ViewBase
             .Label(m => m.Phone, "Phone Number")
             .Label(m => m.LinkedIn, "LinkedIn Profile")
             .Label(m => m.GitHub, "GitHub Profile")
-            .Description(m => m.Email, "We'll use this to contact you")
-            .Description(m => m.Phone, "Optional - for direct contact")
-            .Description(m => m.LinkedIn, "Optional - your professional profile")
-            .Description(m => m.GitHub, "Optional - your code repositories")
             .Validate<string>(m => m.Email, email =>
                 (email.Contains("@") && email.Contains("."), "Please enter a valid email address"))
             .Validate<string>(m => m.LinkedIn, linkedin =>
@@ -94,20 +90,6 @@ public class ProfileApp : ViewBase
                 | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
                     .Loading(loading).Disabled(loading)
                 | validationView
-            | (profile.Value.FirstName != "" && profile.Value.LastName != "" && profile.Value.Email != "" ?
-                new Card(
-                    Text.H3("Profile Preview"),
-                    Layout.Grid()
-                        .Columns(2)
-                        .Rows(3)
-                        | Text.Block($"Name: {profile.Value.FirstName} {profile.Value.LastName}")
-                        | Text.Block("") // Empty cell to complete the grid
-                        | (profile.Value.Phone != null ? Text.Block($"Phone: {profile.Value.Phone}") : Text.Block(""))
-                        | (profile.Value.LinkedIn != null ? Text.Block($"LinkedIn: {profile.Value.LinkedIn}") : Text.Block(""))
-                        | Text.Block($"Email: {profile.Value.Email}")
-                        | (profile.Value.GitHub != null ? Text.Block($"GitHub: {profile.Value.GitHub}") : Text.Block(""))
-                ).Title("Preview")
-                : null)
         );
 
         // Main content - QR Code display
