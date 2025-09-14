@@ -24,6 +24,12 @@ public class ProfileApp : ViewBase
         
         var formBuilder = profile.ToForm()
             .Required(m => m.FirstName, m => m.LastName, m => m.Email)
+            .Place(m => m.FirstName)                    // First column
+            .Place(1, m => m.Email)                     // Second column, same row
+            .Place(m => m.LastName)                     // First column, next row
+            .Place(1, m => m.LinkedIn)                  // Second column, same row
+            .Place(m => m.Phone)                        // First column, next row
+            .Place(1, m => m.GitHub)                    // Second column, same row
             .Label(m => m.FirstName, "First Name")
             .Label(m => m.LastName, "Last Name")
             .Label(m => m.Email, "Email Address")
