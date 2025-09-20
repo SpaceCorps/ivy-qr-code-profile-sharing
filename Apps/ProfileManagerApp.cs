@@ -91,25 +91,11 @@ public class ProfileManagerApp : ViewBase
                 loading.Value = false;
             }
         }
-
-        // Menu items
-        MenuItem[] menuItems = new[]
+        void SelectProfile(Profile profile)
         {
-            MenuItem.Default("All Profiles")
-                .Icon(Icons.List).Tag("profiles"),
-            MenuItem.Default("QR Codes")
-                .Icon(Icons.QrCode).Tag("qrcodes"),
-            MenuItem.Default("Settings")
-                .Icon(Icons.Settings).Tag("settings")
-        };
-
-        var sidebarMenu = new SidebarMenu(
-            onSelect: evt => {
-                selectedPage.Value = evt.Value.ToString()!;
-                client.Toast($"Navigated to {evt.Value}");
-            },
-            items: menuItems
-        );
+            selectedProfile.Value = profile;
+            selectedPage.Value = "profile-details";
+        }
 
         object RenderContent()
         {
@@ -129,6 +115,7 @@ public class ProfileManagerApp : ViewBase
                                 | Text.Label(profile.DisplayName)
                                 | Text.Small($"Created: {profile.CreatedAt:yyyy-MM-dd HH:mm}")
                             | Layout.Horizontal().Gap(2)
+                                | new Button("View").HandleClick(new Action(() => SelectProfile(profile)).ToEventHandler<Button>())
                                 | new Button("QR Code").HandleClick(new Action(() => GenerateQrCode(profile)).ToEventHandler<Button>())
                                 | new Button("Delete").Variant(ButtonVariant.Destructive)
                                     .HandleClick(new Action(() => DeleteProfile(profile)).ToEventHandler<Button>())
@@ -136,6 +123,25 @@ public class ProfileManagerApp : ViewBase
                         :
                         Text.Block("No profiles found. Create some profiles in the Profile Creator app.")
                     ),
+                "profile-details" => selectedProfile.Value != null ?
+                    Layout.Vertical().Gap(6).Padding(2)
+                    | Text.H3($"Profile Details - {selectedProfile.Value.FullName}")
+                    | Layout.Vertical().Gap(4)
+                        | Text.Label("First Name:") | Text.Block(selectedProfile.Value.FirstName)
+                        | Text.Label("Last Name:") | Text.Block(selectedProfile.Value.LastName)
+                        | Text.Label("Email:") | Text.Block(selectedProfile.Value.Email)
+                        | Text.Label("Phone:") | Text.Block(selectedProfile.Value.Phone ?? "Not provided")
+                        | Text.Label("LinkedIn:") | Text.Block(selectedProfile.Value.LinkedIn ?? "Not provided")
+                        | Text.Label("GitHub:") | Text.Block(selectedProfile.Value.GitHub ?? "Not provided")
+                        | Text.Label("Created:") | Text.Block(selectedProfile.Value.CreatedAt.ToString("yyyy-MM-dd HH:mm"))
+                        | Text.Label("Updated:") | Text.Block(selectedProfile.Value.UpdatedAt.ToString("yyyy-MM-dd HH:mm"))
+                    | Layout.Horizontal().Gap(2)
+                        | new Button("Generate QR Code").HandleClick(new Action(() => GenerateQrCode(selectedProfile.Value)).ToEventHandler<Button>())
+                        | new Button("Back to List").HandleClick(new Action(() => selectedPage.Value = "profiles").ToEventHandler<Button>())
+                    :
+                    Layout.Vertical().Gap(4).Padding(2)
+                    | Text.H3("No profile selected")
+                    | Text.Block("Please select a profile from the sidebar."),
                 "qrcodes" => selectedProfile.Value != null && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
                     Layout.Vertical().Gap(4).Padding(2)
                     | Text.H3($"QR Code for {selectedProfile.Value.FullName}")
@@ -153,14 +159,26 @@ public class ProfileManagerApp : ViewBase
                     | Layout.Center()
                     | Text.H3("Select a profile to view QR code")
                     | Text.Block("Click 'QR Code' on any profile to generate and display its QR code."),
-                "settings" => Layout.Vertical().Gap(4).Padding(2)
-                    | Text.H3("Settings")
-                    | Text.Block("Profile management settings will be available here."),
                 _ => Layout.Vertical().Gap(4).Padding(2)
                     | Text.H3("Page not found")
                     | Text.Block("The requested page could not be found.")
             };
         }
+
+        // Sidebar menu with all profile names
+        var sidebarMenu = Layout.Vertical().Gap(2).Padding(2)
+            | Text.H4("All Profiles")
+            | (profiles.Value.Any() ?
+                Layout.Vertical().Gap(1)
+                | profiles.Value.Select(profile => 
+                    new Button(profile.FullName)
+                        .Variant(selectedProfile.Value?.Id == profile.Id ? ButtonVariant.Primary : ButtonVariant.Ghost)
+                        .HandleClick(new Action(() => SelectProfile(profile)).ToEventHandler<Button>())
+                        .Width(Size.Full())
+                ).ToArray()
+                :
+                Text.Small("No profiles created yet")
+            );
 
         return new SidebarLayout(
             mainContent: RenderContent(),
