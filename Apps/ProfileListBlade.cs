@@ -64,7 +64,7 @@ public class ProfileListBlade : ViewBase
                     Layout.Grid().Columns(3).Gap(4)
                     | profiles.Value.Select(profile =>
                         new Card(
-                            Layout.Vertical().Gap(2).Padding(2)
+                            Layout.Vertical().Gap(2).Padding(2).Align(Align.Center)
                                 | Text.H4(profile.FullName)
                                 | Layout.Horizontal().Align(Align.Center)
                                 | new DemoBox(

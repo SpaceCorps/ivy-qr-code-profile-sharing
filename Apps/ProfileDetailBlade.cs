@@ -109,7 +109,7 @@ public class ProfileDetailBlade : ViewBase
                         Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
                     ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70))
                     : null)
-            | Layout.Horizontal().Gap(2)
+            | (Layout.Horizontal().Gap(2)
                 | new Button("Edit").Variant(ButtonVariant.Primary)
                     .WithSheet(
                         () => new EditProfileSheet(
@@ -123,7 +123,7 @@ public class ProfileDetailBlade : ViewBase
                     )
                 | new Button("Delete").Variant(ButtonVariant.Destructive)
                     .HandleClick(new Action(DeleteProfile).ToEventHandler<Button>())
-                    .Loading(loading.Value)
+                    .Loading(loading.Value))
         ).Height(Size.Full());
     }
 }
