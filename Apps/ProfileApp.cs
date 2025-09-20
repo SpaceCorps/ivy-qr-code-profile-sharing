@@ -22,53 +22,42 @@ public class ProfileApp : ViewBase
         var qrCodeBase64 = UseState<string>("");
         var profileSubmitted = UseState<bool>(false);
 
-        var formBuilder = profile.ToForm()
-            .Required(m => m.FirstName, m => m.LastName, m => m.Email)
-            .Place(m => m.FirstName)
-            .Place(m => m.LastName)
-            .Place(m => m.Email)
-            .Place(m => m.Phone)
-            .Place(m => m.LinkedIn)
-            .Place(m => m.GitHub)
-            .Label(m => m.FirstName, "First Name")
-            .Label(m => m.LastName, "Last Name")
-            .Label(m => m.Email, "Email Address")
-            .Label(m => m.Phone, "Phone Number")
-            .Label(m => m.LinkedIn, "LinkedIn Profile")
-            .Label(m => m.GitHub, "GitHub Profile")
-            .Validate<string>(m => m.Email, email =>
-                (email.Contains("@") && email.Contains("."), "Please enter a valid email address"))
-            .Validate<string>(m => m.LinkedIn, linkedin =>
-                (string.IsNullOrEmpty(linkedin) || linkedin.Contains("linkedin.com"), "Please enter a valid LinkedIn URL"))
-            .Validate<string>(m => m.GitHub, github =>
-                (string.IsNullOrEmpty(github) || github.Contains("github.com"), "Please enter a valid GitHub URL"));
-
-        var (onSubmit, formView, validationView, loading) = formBuilder.UseForm(this.Context);
-
-        async void HandleSubmit()
-        {
-            if (await onSubmit())
-            {
-                    // Generate vCard QR code for contact sharing
-                    qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
-                        profile.Value.FirstName,
-                        profile.Value.LastName,
-                        profile.Value.Email,
-                        profile.Value.Phone,
-                        profile.Value.LinkedIn,
-                        profile.Value.GitHub,
-                        8
-                    );
-                    profileSubmitted.Value = true;
-            }
-        }
-
         // Sidebar content - Profile form
         var formContent = Layout.Vertical().Gap(6).Padding(2)
-            | formView
-            | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
-                .Loading(loading).Disabled(loading)
-            | validationView;
+            | profile.ToForm()
+                .Required(m => m.FirstName, m => m.LastName, m => m.Email)
+                .Place(m => m.FirstName)
+                .Place(m => m.LastName)
+                .Place(m => m.Email)
+                .Place(m => m.Phone)
+                .Place(m => m.LinkedIn)
+                .Place(m => m.GitHub)
+                .Label(m => m.FirstName, "First Name")
+                .Label(m => m.LastName, "Last Name")
+                .Label(m => m.Email, "Email Address")
+                .Label(m => m.Phone, "Phone Number")
+                .Label(m => m.LinkedIn, "LinkedIn Profile")
+                .Label(m => m.GitHub, "GitHub Profile")
+                .Validate<string>(m => m.Email, email =>
+                    (email.Contains("@") && email.Contains("."), "Please enter a valid email address"))
+                .Validate<string>(m => m.LinkedIn, linkedin =>
+                    (string.IsNullOrEmpty(linkedin) || linkedin.Contains("linkedin.com"), "Please enter a valid LinkedIn URL"))
+                .Validate<string>(m => m.GitHub, github =>
+                    (string.IsNullOrEmpty(github) || github.Contains("github.com"), "Please enter a valid GitHub URL"))
+            | new Button("Create Profile").HandleClick(new Action(() =>
+            {
+                // Generate vCard QR code for contact sharing
+                qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
+                    profile.Value.FirstName,
+                    profile.Value.LastName,
+                    profile.Value.Email,
+                    profile.Value.Phone,
+                    profile.Value.LinkedIn,
+                    profile.Value.GitHub,
+                    8
+                );
+                profileSubmitted.Value = true;
+            }).ToEventHandler<Button>());
 
         // Main content - Single card that changes content
         var qrCodeContent = new Card(
