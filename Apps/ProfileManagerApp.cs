@@ -92,11 +92,11 @@ public class ProfileManagerApp : ViewBase
 
         // Profile list view
         var profileListView = Layout.Vertical().Gap(4).Padding(2)
-            | Layout.Horizontal().Gap(2)
                 | new TextInput()
                     .Placeholder("Search profiles...")
+                | (Layout.Horizontal().Gap(2)
                 | new Button("Search").HandleClick(new Action(SearchProfiles).ToEventHandler<Button>())
-                | new Button("Refresh").HandleClick(new Action(LoadProfiles).ToEventHandler<Button>())
+                | new Button("Refresh").HandleClick(new Action(LoadProfiles).ToEventHandler<Button>()))
             | (profiles.Value.Any() ?
                 Layout.Vertical().Gap(2)
                 | profiles.Value.Select(profile => 
