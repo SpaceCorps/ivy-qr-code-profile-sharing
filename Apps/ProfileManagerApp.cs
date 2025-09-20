@@ -38,6 +38,11 @@ public class ProfileManagerRootView : ViewBase
             }
         }
 
+        void ShowProfileDetail(Profile profile)
+        {
+            blades.Push(this, new ProfileDetailBlade(profile), profile.FullName);
+        }
+
         // Sidebar menu with all profile names using ListItems for blade navigation
         var sidebarMenu = Layout.Vertical().Gap(2).Padding(2)
             | Text.H4("All Profiles")
@@ -45,7 +50,7 @@ public class ProfileManagerRootView : ViewBase
                 new List(profiles.Value.Select(profile =>
                     new ListItem(profile.FullName, onClick: _ =>
                     {
-                        blades.Push(this, new ProfileDetailBlade(profile), profile.FullName);
+                        ShowProfileDetail(profile);
                     })
                 ).ToArray())
                 :
@@ -53,7 +58,7 @@ public class ProfileManagerRootView : ViewBase
             );
 
         return new SidebarLayout(
-            mainContent: new ProfileListBlade(),
+            mainContent: new ProfileListBlade(ShowProfileDetail),
             sidebarContent: sidebarMenu,
             sidebarHeader: Layout.Vertical().Gap(2)
                 | Text.Lead("Profile Manager")

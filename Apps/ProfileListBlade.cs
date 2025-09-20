@@ -5,11 +5,17 @@ namespace IvyQrCodeProfileSharing.Apps;
 
 public class ProfileListBlade : ViewBase
 {
+    private readonly Action<Profile>? _onProfileSelected;
+
+    public ProfileListBlade(Action<Profile>? onProfileSelected = null)
+    {
+        _onProfileSelected = onProfileSelected;
+    }
+
     public override object? Build()
     {
         var profiles = UseState(() => new List<Profile>());
         var loading = UseState(() => false);
-        var blades = this.UseContext<IBladeController>();
 
         // Load profiles when blade loads
         UseEffect(() =>
@@ -32,7 +38,7 @@ public class ProfileListBlade : ViewBase
 
         void SelectProfile(Profile profile)
         {
-            blades.Push(this, new ProfileDetailBlade(profile), profile.FullName);
+            _onProfileSelected?.Invoke(profile);
         }
 
         string GenerateQrCodeForProfile(Profile profile)
