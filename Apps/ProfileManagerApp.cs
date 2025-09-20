@@ -131,10 +131,9 @@ public class ProfileManagerApp : ViewBase
                             new Card(
                                  Layout.Vertical().Gap(2)
                                     | Text.H4(profile.FullName)
-                                    | Text.Small($"Email: {profile.Email}")
                                     | new DemoBox(
                                     Text.Html($"<img src=\"data:image/png;base64,{GenerateQrCodeForProfile(profile)}\" />")
-                                ).BorderStyle(BorderStyle.None).Width(Size.Units(150)).Height(Size.Units(150))
+                                ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70))
                             ).Width(Size.Full())
                         ).ToArray()
                         :
@@ -162,7 +161,7 @@ public class ProfileManagerApp : ViewBase
                                 | Layout.Horizontal().Align(Align.Center)
                                 | new DemoBox(
                                     Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
-                                ).BorderStyle(BorderStyle.None).Width(Size.Units(150)).Height(Size.Units(150))
+                                ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70))
                                 : null)
                     ).Height(Size.Full())
                     :
