@@ -25,11 +25,11 @@ public class ProfileApp : ViewBase
         var formBuilder = profile.ToForm()
             .Required(m => m.FirstName, m => m.LastName, m => m.Email)
             .Place(m => m.FirstName)
-            .Place(1, m => m.Email)
             .Place(m => m.LastName)
-            .Place(1, m => m.LinkedIn)
+            .Place(m => m.Email)
             .Place(m => m.Phone)
-            .Place(1, m => m.GitHub)
+            .Place(m => m.LinkedIn)
+            .Place(m => m.GitHub)
             .Label(m => m.FirstName, "First Name")
             .Label(m => m.LastName, "Last Name")
             .Label(m => m.Email, "Email Address")
@@ -49,64 +49,55 @@ public class ProfileApp : ViewBase
         {
             if (await onSubmit())
             {
-                    // Generate vCard QR code for contact sharing
-                    qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
-                        profile.Value.FirstName,
-                        profile.Value.LastName,
-                        profile.Value.Email,
-                        profile.Value.Phone,
-                        profile.Value.LinkedIn,
-                        profile.Value.GitHub,
-                        8
-                    );
-                    profileSubmitted.Value = true;
+                // Generate vCard QR code for contact sharing
+                qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
+                    profile.Value.FirstName,
+                    profile.Value.LastName,
+                    profile.Value.Email,
+                    profile.Value.Phone,
+                    profile.Value.LinkedIn,
+                    profile.Value.GitHub,
+                    8
+                );
+                profileSubmitted.Value = true;
             }
         }
 
         // Sidebar content - Profile form
-        var formContent = new Card(
-            Layout.Vertical().Gap(6).Padding(2)
-            | Text.H2("Create Your Profile")
-            | Text.Block("Fill in your information to create a shareable profile")
-            | new Separator()
+        var formContent = Layout.Vertical().Gap(6).Padding(2)
             | formView
-            | Layout.Horizontal()
+            | (Layout.Horizontal()
                 | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
                     .Loading(loading).Disabled(loading)
                 | validationView
-        ).Height(Size.Full());
+                );
 
-        // Main content - QR Code display
-        var qrCodeContent = profileSubmitted.Value && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
-            new Card(
-                Layout.Vertical().Gap(6).Padding(2)
-                | Text.H2("Your QR Code")
-                | Text.Block("Scan this QR code with your phone to automatically add this contact to your contacts:")
+        // Main content - Single card that changes content
+        var qrCodeContent = new Card(
+            Layout.Vertical().Gap(6).Padding(2)
+            | (profileSubmitted.Value && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
+                Layout.Vertical().Gap(6)
+                | (Layout.Center()
+                    | Text.H2("Your QR Code"))
                 | (Layout.Horizontal().Align(Align.Center)
                 | new DemoBox(
                     Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
-            ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70)))
-                | (Layout.Horizontal().Align(Align.Center)
-                    | new Button("Generate New QR Code").HandleClick(new Action(() =>
-                    {
-                        qrCodeBase64.Value = "";
-                        profileSubmitted.Value = false;
-                    }).ToEventHandler<Button>()))
-
-            ).Height(Size.Full())
-            : new Card(
-                Layout.Vertical().Gap(6).Padding(2)
+                ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70)))
+                :
+                Layout.Vertical().Gap(6)
                 | (Layout.Center()
                     | Text.H2("Welcome to Profile Creator"))
                 | Text.Block("Fill out the form in the sidebar to create your shareable profile QR code.")
                 | Text.Block("Once you submit the form, your QR code will appear here in the main content area.")
-            ).Height(Size.Full());
+            )
+        ).Height(Size.Full());
 
-        return Layout.Vertical().Height(Size.Full())
-            | new ResizeablePanelGroup(
-                new ResizeablePanel(70, formContent), 
-                new ResizeablePanel(30, qrCodeContent)    
-            ).Horizontal();
+        return new SidebarLayout(
+            mainContent: qrCodeContent,
+            sidebarContent: formContent,
+            sidebarHeader: Layout.Vertical().Gap(1)
+                | Text.Lead("Profile Creator")
+        );
 
     }
 }
