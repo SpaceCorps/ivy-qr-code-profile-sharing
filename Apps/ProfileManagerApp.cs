@@ -67,10 +67,6 @@ public class ProfileManagerRootView : ViewBase
             }
         }
 
-        void ShowProfileDetail(Profile profile)
-        {
-            blades.Push(this, new ProfileDetailBlade(profile), profile.FullName);
-        }
 
         // Sidebar menu with search and filtered profile names
         var sidebarMenu = Layout.Vertical().Gap(2).Padding(2)
@@ -79,12 +75,16 @@ public class ProfileManagerRootView : ViewBase
                 .Placeholder("Search profiles...")
                 .Variant(TextInputs.Search)
             | (filteredProfiles.Value?.Any() == true ?
-                new List(filteredProfiles.Value.Select(profile =>
-                    new ListItem(profile.FullName, onClick: _ =>
-                    {
-                        ShowProfileDetail(profile);
-                    })
-                ).ToArray())
+                Layout.Vertical().Gap(1)
+                | filteredProfiles.Value.Select(profile =>
+                    new Button(profile.FullName).Variant(ButtonVariant.Outline)
+                        .WithSheet(
+                            () => new ProfileDetailSheet(profile),
+                            title: profile.FullName,
+                            description: "View profile details and QR code",
+                            width: Size.Fraction(2 / 3f)
+                        )
+                ).ToArray()
                 :
                 searchTerm.Value?.Length > 0 ?
                     Text.Small($"No profiles found matching '{searchTerm.Value}'") :
@@ -92,10 +92,9 @@ public class ProfileManagerRootView : ViewBase
             );
 
         return new SidebarLayout(
-            mainContent: new ProfileListBlade(ShowProfileDetail, filteredProfiles.Value),
+            mainContent: new ProfileListBlade(filteredProfiles.Value),
             sidebarContent: sidebarMenu,
             sidebarHeader: Layout.Vertical().Gap(2)
-                | Text.Lead("Profile Manager")
         );
     }
 }

@@ -5,12 +5,10 @@ namespace IvyQrCodeProfileSharing.Apps;
 
 public class ProfileListBlade : ViewBase
 {
-    private readonly Action<Profile>? _onProfileSelected;
     private readonly List<Profile>? _profiles;
 
-    public ProfileListBlade(Action<Profile>? onProfileSelected = null, List<Profile>? profiles = null)
+    public ProfileListBlade(List<Profile>? profiles = null)
     {
-        _onProfileSelected = onProfileSelected;
         _profiles = profiles;
     }
 
@@ -18,6 +16,7 @@ public class ProfileListBlade : ViewBase
     {
         var profiles = UseState(() => _profiles ?? new List<Profile>());
         var loading = UseState(() => false);
+        var client = UseService<IClientProvider>();
 
         // Load profiles when blade loads (only if not provided in constructor)
         UseEffect(() =>
@@ -41,10 +40,7 @@ public class ProfileListBlade : ViewBase
             }
         }
 
-        void SelectProfile(Profile profile)
-        {
-            _onProfileSelected?.Invoke(profile);
-        }
+        // Profile detail will be shown via button's WithSheet method
 
         string GenerateQrCodeForProfile(Profile profile)
         {
@@ -82,7 +78,12 @@ public class ProfileListBlade : ViewBase
                                     Text.Html($"<img src=\"data:image/png;base64,{GenerateQrCodeForProfile(profile)}\" />")
                                 ).BorderStyle(BorderStyle.None).Width(Size.Units(80)).Height(Size.Units(80))
                                 | new Button("View").Variant(ButtonVariant.Secondary)
-                                    .HandleClick(new Action(() => SelectProfile(profile)).ToEventHandler<Button>())
+                                    .WithSheet(
+                                        () => new ProfileDetailSheet(profile),
+                                        title: profile.FullName,
+                                        description: "View profile details and QR code",
+                                        width: Size.Fraction(2 / 3f)
+                                    )
                         ).Width(Size.Full())
                     ).ToArray()
                     :

@@ -84,7 +84,8 @@ public class EditProfileSheet : ViewBase
                         Phone = editProfile.Value.Phone,
                         LinkedIn = editProfile.Value.LinkedIn,
                         GitHub = editProfile.Value.GitHub,
-                        CreatedAt = _profile.CreatedAt
+                        CreatedAt = _profile.CreatedAt,
+                        UpdatedAt = DateTime.UtcNow
                     };
 
                     _onSave(updatedProfile);
@@ -107,6 +108,24 @@ public class EditProfileSheet : ViewBase
             new Card(
                 Layout.Vertical().Gap(4).Padding(2)
                 | Text.H3($"Edit Profile - {_profile.FullName}")
+                | new Card(
+                    Layout.Vertical().Gap(2).Padding(2)
+                    | Text.H4("Profile Information (Read-Only)")
+                    | Layout.Horizontal().Gap(4)
+                        | Layout.Vertical().Gap(1)
+                            | Text.Label("Full Name")
+                            | Text.P(_profile.FullName)
+                        | Layout.Vertical().Gap(1)
+                            | Text.Label("Display Name")
+                            | Text.P(_profile.DisplayName)
+                    | Layout.Horizontal().Gap(4)
+                        | Layout.Vertical().Gap(1)
+                            | Text.Label("Created At")
+                            | Text.P(_profile.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss UTC"))
+                        | Layout.Vertical().Gap(1)
+                            | Text.Label("Updated At")
+                            | Text.P(_profile.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss UTC"))
+                )
                 | formView
                 | validationView
             ).Title("Profile Information")
