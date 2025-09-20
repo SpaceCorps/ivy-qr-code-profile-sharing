@@ -13,7 +13,7 @@ public class ProfileManagerApp : ViewBase
         var selectedProfile = UseState(() => (Profile?)null);
         var qrCodeBase64 = UseState(() => "");
         var loading = UseState(() => false);
-        var selectedPage = UseState("profiles");
+        var selectedPage = UseState("qrcodes-list");
         var client = UseService<IClientProvider>();
 
         // Load profiles on startup
@@ -98,32 +98,47 @@ public class ProfileManagerApp : ViewBase
             GenerateQrCode(profile);
         }
 
+        string GenerateQrCodeForProfile(Profile profile)
+        {
+            try
+            {
+                var qrCodeService = new QrCodeService();
+                return qrCodeService.GenerateVCardQrCodeAsBase64(
+                    profile.FirstName,
+                    profile.LastName,
+                    profile.Email,
+                    profile.Phone,
+                    profile.LinkedIn,
+                    profile.GitHub
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error generating QR code for {profile.FullName}: {ex.Message}");
+                return ""; // Return empty string on error
+            }
+        }
 
         object RenderContent()
         {
             return selectedPage.Value switch
             {
-                "profiles" => Layout.Vertical().Gap(6).Padding(2)
-                    | new TextInput()
-                        .Placeholder("Search profiles...")
-                    | (Layout.Horizontal().Gap(2)
-                        | new Button("Search").HandleClick(new Action(SearchProfiles).ToEventHandler<Button>())
-                        | new Button("Refresh").HandleClick(new Action(LoadProfiles).ToEventHandler<Button>()))
+                "qrcodes-list" => Layout.Vertical().Gap(6).Padding(2)
+                    | Text.H3("All QR Codes")
                     | (profiles.Value.Any() ?
-                        Layout.Vertical().Gap(2)
+                        Layout.Vertical().Gap(4)
                         | profiles.Value.Select(profile =>
-                            Layout.Horizontal().Gap(4).Padding(2)
-                            | Layout.Vertical().Gap(1)
-                                | Text.Label(profile.DisplayName)
-                                | Text.Small($"Created: {profile.CreatedAt:yyyy-MM-dd HH:mm}")
-                            | Layout.Horizontal().Gap(2)
-                                | new Button("View").HandleClick(new Action(() => SelectProfile(profile)).ToEventHandler<Button>())
-                                | new Button("QR Code").HandleClick(new Action(() => GenerateQrCode(profile)).ToEventHandler<Button>())
-                                | new Button("Delete").Variant(ButtonVariant.Destructive)
-                                    .HandleClick(new Action(() => DeleteProfile(profile)).ToEventHandler<Button>())
+                            new Card(
+                                 Layout.Vertical().Gap(2)
+                                    | Text.H4(profile.FullName)
+                                    | Text.Small($"Email: {profile.Email}")
+                                    | new DemoBox(
+                                    Text.Html($"<img src=\"data:image/png;base64,{GenerateQrCodeForProfile(profile)}\" />")
+                                ).BorderStyle(BorderStyle.None).Width(Size.Units(150)).Height(Size.Units(150))
+                            ).Width(Size.Full())
                         ).ToArray()
                         :
-                        Text.Block("No profiles found. Create some profiles in the Profile Creator app.")
+                        Text.Block("No profiles found. Create some profiles first.")
                     ),
                 "profile-details" => selectedProfile.Value != null ?
                     new Card(
