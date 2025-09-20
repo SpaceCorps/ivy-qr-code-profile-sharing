@@ -151,9 +151,7 @@ public class ProfileManagerApp : ViewBase
                         | Text.Label($"GitHub: {selectedProfile.Value.GitHub ?? "Not provided"}")
                         | Text.Label($"Created: {selectedProfile.Value.CreatedAt:yyyy-MM-dd HH:mm}")
                         | Text.Label($"Updated: {selectedProfile.Value.UpdatedAt:yyyy-MM-dd HH:mm}")
-                        | (Layout.Horizontal().Gap(2)
-                            | new Button("Back to List").HandleClick(new Action(() => selectedPage.Value = "profiles").ToEventHandler<Button>()))
-                        | (loading.Value ? 
+                        | (loading.Value ?
                             Text.Block("Generating QR Code...") :
                             !string.IsNullOrEmpty(qrCodeBase64.Value) ?
                                 Layout.Vertical().Gap(4)
@@ -163,6 +161,16 @@ public class ProfileManagerApp : ViewBase
                                     Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
                                 ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70))
                                 : null)
+                        | (Layout.Horizontal().Gap(2)
+                        | new Button("Back to List").HandleClick(new Action(() => selectedPage.Value = "qrcodes-list").ToEventHandler<Button>())
+                        
+                            | new Button("Edit").Variant(ButtonVariant.Primary)
+                                .HandleClick(new Action(() => {
+                                    // TODO: Implement edit functionality
+                                    client.Toast("Edit functionality coming soon!");
+                                }).ToEventHandler<Button>())
+                            | new Button("Delete").Variant(ButtonVariant.Destructive)
+                                .HandleClick(new Action(() => DeleteProfile(selectedProfile.Value)).ToEventHandler<Button>()))
                     ).Height(Size.Full())
                     :
                     Layout.Vertical().Gap(4).Padding(2)
@@ -171,15 +179,10 @@ public class ProfileManagerApp : ViewBase
                 "qrcodes" => selectedProfile.Value != null && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
                     Layout.Vertical().Gap(4).Padding(2)
                     | Text.H3($"QR Code for {selectedProfile.Value.FullName}")
-                    | Layout.Horizontal().Align(Align.Center)
                     | new DemoBox(
                         Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
                     ).BorderStyle(BorderStyle.None).Width(Size.Units(100)).Height(Size.Units(100))
-                    | new Button("Close").HandleClick(new Action(() =>
-                    {
-                        selectedProfile.Value = null;
-                        qrCodeBase64.Value = "";
-                    }).ToEventHandler<Button>())
+                    | new Button("Back to List").HandleClick(new Action(() => selectedPage.Value = "profiles").ToEventHandler<Button>())
                     :
                     Layout.Vertical().Gap(4).Padding(2)
                     | Layout.Center()
