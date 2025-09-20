@@ -65,13 +65,10 @@ public class ProfileApp : ViewBase
 
         // Sidebar content - Profile form
         var formContent = Layout.Vertical().Gap(6).Padding(2)
-            | Text.Block("Fill in your information to create a shareable profile")
-            | new Separator()
             | formView
-            | Layout.Horizontal()
-                | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
-                    .Loading(loading).Disabled(loading)
-                | validationView;
+            | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
+                .Loading(loading).Disabled(loading)
+            | validationView;
 
         // Main content - Single card that changes content
         var qrCodeContent = new Card(
