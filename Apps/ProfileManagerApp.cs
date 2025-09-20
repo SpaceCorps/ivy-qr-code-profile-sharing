@@ -167,12 +167,7 @@ public class ProfileManagerApp : ViewBase
             sidebarContent: sidebarMenu,
             sidebarHeader: Layout.Vertical().Gap(2)
                 | Text.Lead("Profile Manager")
-                | new TextInput(placeholder: "Search...", variant: TextInputs.Search),
-            sidebarFooter: Layout.Horizontal().Gap(2)
-                | new Avatar("PM").Size(20)
-                | (Layout.Vertical()
-                    | Text.Small("Profile Manager")
-                    | Text.Small("Manage your profiles"))
+                | new TextInput(placeholder: "Search...", variant: TextInputs.Search)
         );
     }
 }
