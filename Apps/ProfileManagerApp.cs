@@ -95,6 +95,7 @@ public class ProfileManagerApp : ViewBase
         {
             selectedProfile.Value = profile;
             selectedPage.Value = "profile-details";
+            GenerateQrCode(profile);
         }
 
 
@@ -137,8 +138,17 @@ public class ProfileManagerApp : ViewBase
                         | Text.Label($"Created: {selectedProfile.Value.CreatedAt:yyyy-MM-dd HH:mm}")
                         | Text.Label($"Updated: {selectedProfile.Value.UpdatedAt:yyyy-MM-dd HH:mm}")
                         | (Layout.Horizontal().Gap(2)
-                            | new Button("Generate QR Code").HandleClick(new Action(() => GenerateQrCode(selectedProfile.Value)).ToEventHandler<Button>())
                             | new Button("Back to List").HandleClick(new Action(() => selectedPage.Value = "profiles").ToEventHandler<Button>()))
+                        | (loading.Value ? 
+                            Text.Block("Generating QR Code...") :
+                            !string.IsNullOrEmpty(qrCodeBase64.Value) ?
+                                Layout.Vertical().Gap(4)
+                                | Text.H4("QR Code")
+                                | Layout.Horizontal().Align(Align.Center)
+                                | new DemoBox(
+                                    Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
+                                ).BorderStyle(BorderStyle.None).Width(Size.Units(150)).Height(Size.Units(150))
+                                : null)
                     ).Height(Size.Full())
                     :
                     Layout.Vertical().Gap(4).Padding(2)
