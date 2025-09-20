@@ -6,21 +6,26 @@ namespace IvyQrCodeProfileSharing.Apps;
 public class ProfileListBlade : ViewBase
 {
     private readonly Action<Profile>? _onProfileSelected;
+    private readonly List<Profile>? _profiles;
 
-    public ProfileListBlade(Action<Profile>? onProfileSelected = null)
+    public ProfileListBlade(Action<Profile>? onProfileSelected = null, List<Profile>? profiles = null)
     {
         _onProfileSelected = onProfileSelected;
+        _profiles = profiles;
     }
 
     public override object? Build()
     {
-        var profiles = UseState(() => new List<Profile>());
+        var profiles = UseState(() => _profiles ?? new List<Profile>());
         var loading = UseState(() => false);
 
-        // Load profiles when blade loads
+        // Load profiles when blade loads (only if not provided in constructor)
         UseEffect(() =>
         {
-            LoadProfiles();
+            if (_profiles == null)
+            {
+                LoadProfiles();
+            }
         }, []);
 
         void LoadProfiles()
