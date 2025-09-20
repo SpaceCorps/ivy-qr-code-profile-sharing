@@ -97,6 +97,31 @@ public class ProfileManagerApp : ViewBase
             selectedPage.Value = "profile-details";
         }
 
+        object RenderProfileDetails(Profile profile)
+        {
+            return Layout.Vertical().Gap(6).Padding(2)
+                | Text.H3($"Profile Details - {profile.FullName}")
+                | (Layout.Horizontal().Gap(4)
+                    | Text.Label("First Name:") | Text.Block(profile.FirstName))
+                | (Layout.Horizontal().Gap(4)
+                    | Text.Label("Last Name:") | Text.Block(profile.LastName))
+                | (Layout.Horizontal().Gap(4)
+                    | Text.Label("Email:") | Text.Block(profile.Email))
+                | (Layout.Horizontal().Gap(4)
+                    | Text.Label("Phone:") | Text.Block(profile.Phone ?? "Not provided"))
+                | (Layout.Horizontal().Gap(4)
+                    | Text.Label("LinkedIn:") | Text.Block(profile.LinkedIn ?? "Not provided"))
+                | (Layout.Horizontal().Gap(4)
+                    | Text.Label("GitHub:") | Text.Block(profile.GitHub ?? "Not provided"))
+                | (Layout.Horizontal().Gap(4)
+                    | Text.Label("Created:") | Text.Block(profile.CreatedAt.ToString("yyyy-MM-dd HH:mm")))
+                | (Layout.Horizontal().Gap(4)
+                    | Text.Label("Updated:") | Text.Block(profile.UpdatedAt.ToString("yyyy-MM-dd HH:mm")))
+                | Layout.Horizontal().Gap(2)
+                    | new Button("Generate QR Code").HandleClick(new Action(() => GenerateQrCode(profile)).ToEventHandler<Button>())
+                    | new Button("Back to List").HandleClick(new Action(() => selectedPage.Value = "profiles").ToEventHandler<Button>());
+        }
+
         object RenderContent()
         {
             return selectedPage.Value switch
@@ -124,20 +149,7 @@ public class ProfileManagerApp : ViewBase
                         Text.Block("No profiles found. Create some profiles in the Profile Creator app.")
                     ),
                 "profile-details" => selectedProfile.Value != null ?
-                    Layout.Vertical().Gap(6).Padding(2)
-                    | Text.H3($"Profile Details - {selectedProfile.Value.FullName}")
-                    | Layout.Vertical().Gap(4)
-                        | Text.Label("First Name:") | Text.Block(selectedProfile.Value.FirstName)
-                        | Text.Label("Last Name:") | Text.Block(selectedProfile.Value.LastName)
-                        | Text.Label("Email:") | Text.Block(selectedProfile.Value.Email)
-                        | Text.Label("Phone:") | Text.Block(selectedProfile.Value.Phone ?? "Not provided")
-                        | Text.Label("LinkedIn:") | Text.Block(selectedProfile.Value.LinkedIn ?? "Not provided")
-                        | Text.Label("GitHub:") | Text.Block(selectedProfile.Value.GitHub ?? "Not provided")
-                        | Text.Label("Created:") | Text.Block(selectedProfile.Value.CreatedAt.ToString("yyyy-MM-dd HH:mm"))
-                        | Text.Label("Updated:") | Text.Block(selectedProfile.Value.UpdatedAt.ToString("yyyy-MM-dd HH:mm"))
-                    | Layout.Horizontal().Gap(2)
-                        | new Button("Generate QR Code").HandleClick(new Action(() => GenerateQrCode(selectedProfile.Value)).ToEventHandler<Button>())
-                        | new Button("Back to List").HandleClick(new Action(() => selectedPage.Value = "profiles").ToEventHandler<Button>())
+                    RenderProfileDetails(selectedProfile.Value)
                     :
                     Layout.Vertical().Gap(4).Padding(2)
                     | Text.H3("No profile selected")
