@@ -73,24 +73,25 @@ public class ProfileApp : ViewBase
                     .Loading(loading).Disabled(loading)
                 | validationView;
 
-        // Main content - QR Code display
-        var qrCodeContent = profileSubmitted.Value && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
-            new Card(
-                Layout.Vertical().Gap(6).Padding(2)
+        // Main content - Single card that changes content
+        var qrCodeContent = new Card(
+            Layout.Vertical().Gap(6).Padding(2)
+            | (profileSubmitted.Value && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
+                Layout.Vertical().Gap(6)
                 | Text.H2("Your QR Code")
                 | Text.Block("Scan this QR code with your phone to automatically add this contact to your contacts:")
                 | (Layout.Horizontal().Align(Align.Center)
                 | new DemoBox(
                     Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
-            ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70)))
-            ).Height(Size.Full())
-            : new Card(
-                Layout.Vertical().Gap(6).Padding(2)
+                ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70)))
+                :
+                Layout.Vertical().Gap(6)
                 | (Layout.Center()
                     | Text.H2("Welcome to Profile Creator"))
                 | Text.Block("Fill out the form in the sidebar to create your shareable profile QR code.")
                 | Text.Block("Once you submit the form, your QR code will appear here in the main content area.")
-            ).Height(Size.Full());
+            )
+        ).Height(Size.Full());
 
         return new SidebarLayout(
             mainContent: qrCodeContent,
