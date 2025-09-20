@@ -153,6 +153,8 @@ public class ProfileManagerApp : ViewBase
                                     | new DemoBox(
                                     Text.Html($"<img src=\"data:image/png;base64,{GenerateQrCodeForProfile(profile)}\" />")
                                 ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70))
+                                    | new Button("View").Variant(ButtonVariant.Secondary)
+                                        .HandleClick(new Action(() => SelectProfile(profile)).ToEventHandler<Button>())
                             ).Width(Size.Full())
                         ).ToArray()
                         :
