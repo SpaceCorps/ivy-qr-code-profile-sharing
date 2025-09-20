@@ -145,14 +145,15 @@ public class ProfileManagerApp : ViewBase
                 "qrcodes-list" => Layout.Vertical().Gap(6).Padding(2)
                     | Text.H3("All QR Codes")
                     | (profiles.Value.Any() ?
-                        Layout.Vertical().Gap(4)
+                        Layout.Grid().Columns(3).Gap(4)
                         | profiles.Value.Select(profile =>
                             new Card(
-                                 Layout.Vertical().Gap(2)
+                                 Layout.Vertical().Gap(2).Padding(2)
                                     | Text.H4(profile.FullName)
+                                    | Layout.Horizontal().Align(Align.Center)
                                     | new DemoBox(
                                     Text.Html($"<img src=\"data:image/png;base64,{GenerateQrCodeForProfile(profile)}\" />")
-                                ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70))
+                                ).BorderStyle(BorderStyle.None).Width(Size.Units(80)).Height(Size.Units(80))
                                     | new Button("View").Variant(ButtonVariant.Secondary)
                                         .HandleClick(new Action(() => SelectProfile(profile)).ToEventHandler<Button>())
                             ).Width(Size.Full())
