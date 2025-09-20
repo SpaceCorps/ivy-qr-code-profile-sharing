@@ -64,17 +64,14 @@ public class ProfileApp : ViewBase
         }
 
         // Sidebar content - Profile form
-        var formContent = new Card(
-            Layout.Vertical().Gap(6).Padding(2)
-            | Text.H2("Create Your Profile")
+        var formContent = Layout.Vertical().Gap(6).Padding(2)
             | Text.Block("Fill in your information to create a shareable profile")
             | new Separator()
             | formView
             | Layout.Horizontal()
                 | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
                     .Loading(loading).Disabled(loading)
-                | validationView
-        ).Height(Size.Full());
+                | validationView;
 
         // Main content - QR Code display
         var qrCodeContent = profileSubmitted.Value && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
@@ -102,11 +99,12 @@ public class ProfileApp : ViewBase
                 | Text.Block("Once you submit the form, your QR code will appear here in the main content area.")
             ).Height(Size.Full());
 
-        return Layout.Vertical().Height(Size.Full())
-            | new ResizeablePanelGroup(
-                new ResizeablePanel(70, formContent), 
-                new ResizeablePanel(30, qrCodeContent)    
-            ).Horizontal();
+        return new SidebarLayout(
+            mainContent: qrCodeContent,
+            sidebarContent: formContent,
+            sidebarHeader: Layout.Vertical().Gap(1)
+                | Text.Lead("Profile Creator")
+        );
 
     }
 }
