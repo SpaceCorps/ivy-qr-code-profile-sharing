@@ -83,13 +83,6 @@ public class ProfileApp : ViewBase
                 | new DemoBox(
                     Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
             ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70)))
-                | (Layout.Horizontal().Align(Align.Center)
-                    | new Button("Generate New QR Code").HandleClick(new Action(() =>
-                    {
-                        qrCodeBase64.Value = "";
-                        profileSubmitted.Value = false;
-                    }).ToEventHandler<Button>()))
-
             ).Height(Size.Full())
             : new Card(
                 Layout.Vertical().Gap(6).Padding(2)
