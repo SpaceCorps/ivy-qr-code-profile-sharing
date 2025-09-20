@@ -108,11 +108,11 @@ public class ProfileApp : ViewBase
                 Layout.Vertical().Gap(6)
                 | (Layout.Center()
                     | Text.H2($"QR Code for {createdProfile.Value.FullName}"))
-                | Text.Block($"Profile ID: {createdProfile.Value.Id} | Created: {createdProfile.Value.CreatedAt:yyyy-MM-dd HH:mm}")
-                | (Layout.Horizontal().Align(Align.Center)
+                | (Layout.Vertical().Align(Align.Center)
                 | new DemoBox(
                     Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
-                ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70)))
+                ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70))
+                | Text.Block($"Profile ID: {createdProfile.Value.Id} | Created: {createdProfile.Value.CreatedAt:yyyy-MM-dd HH:mm}"))
                 | (Layout.Horizontal().Align(Align.Center)
                     | new Button("Create Another Profile").HandleClick(new Action(() =>
                     {
