@@ -91,9 +91,7 @@ public class ProfileManagerApp : ViewBase
         }
 
         // Profile list view
-        var profileListView = new Card(
-            Layout.Vertical().Gap(4).Padding(2)
-            | Text.H3("Profiles")
+        var profileListView = Layout.Vertical().Gap(4).Padding(2)
             | Layout.Horizontal().Gap(2)
                 | new TextInput("Search profiles...")
                 | new Button("Search").HandleClick(new Action(SearchProfiles).ToEventHandler<Button>())
@@ -101,21 +99,18 @@ public class ProfileManagerApp : ViewBase
             | (profiles.Value.Any() ?
                 Layout.Vertical().Gap(2)
                 | profiles.Value.Select(profile => 
-                    new Card(
-                        Layout.Horizontal().Gap(4).Padding(2)
-                        | Layout.Vertical().Gap(1)
-                            | Text.Label(profile.DisplayName)
-                            | Text.Small($"Created: {profile.CreatedAt:yyyy-MM-dd HH:mm}")
-                        | Layout.Horizontal().Gap(2)
-                            | new Button("QR Code").HandleClick(new Action(() => GenerateQrCode(profile)).ToEventHandler<Button>())
-                            | new Button("Delete").Variant(ButtonVariant.Destructive)
-                                .HandleClick(new Action(() => DeleteProfile(profile)).ToEventHandler<Button>())
-                    ).Width(Size.Full())
+                    Layout.Horizontal().Gap(4).Padding(2)
+                    | Layout.Vertical().Gap(1)
+                        | Text.Label(profile.DisplayName)
+                        | Text.Small($"Created: {profile.CreatedAt:yyyy-MM-dd HH:mm}")
+                    | Layout.Horizontal().Gap(2)
+                        | new Button("QR Code").HandleClick(new Action(() => GenerateQrCode(profile)).ToEventHandler<Button>())
+                        | new Button("Delete").Variant(ButtonVariant.Destructive)
+                            .HandleClick(new Action(() => DeleteProfile(profile)).ToEventHandler<Button>())
                 ).ToArray()
                 :
                 Text.Block("No profiles found. Create some profiles in the Profile Creator app.")
-            )
-        ).Height(Size.Full());
+            );
 
         // QR Code display
         var qrCodeView = selectedProfile.Value != null && !string.IsNullOrEmpty(qrCodeBase64.Value) ?
