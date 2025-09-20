@@ -98,6 +98,25 @@ public class ProfileManagerApp : ViewBase
             GenerateQrCode(profile);
         }
 
+        void HandleProfileUpdate(Profile updatedProfile)
+        {
+            try
+            {
+                ProfileStorage.Update(updatedProfile);
+                
+                // Update the selected profile and refresh the list
+                selectedProfile.Value = updatedProfile;
+                LoadProfiles();
+                
+                // Regenerate QR code
+                GenerateQrCode(updatedProfile);
+            }
+            catch (Exception ex)
+            {
+                client.Toast($"Error updating profile: {ex.Message}");
+            }
+        }
+
         string GenerateQrCodeForProfile(Profile profile)
         {
             try
@@ -164,11 +183,17 @@ public class ProfileManagerApp : ViewBase
                         | (Layout.Horizontal().Gap(2)
                         | new Button("Back to List").HandleClick(new Action(() => selectedPage.Value = "qrcodes-list").ToEventHandler<Button>())
                         
-                            | new Button("Edit").Variant(ButtonVariant.Primary)
-                                .HandleClick(new Action(() => {
-                                    // TODO: Implement edit functionality
-                                    client.Toast("Edit functionality coming soon!");
-                                }).ToEventHandler<Button>())
+                             | new Button("Edit").Variant(ButtonVariant.Primary)
+                                 .WithSheet(
+                                     () => new EditProfileSheet(
+                                         selectedProfile.Value,
+                                         HandleProfileUpdate,
+                                         () => client.Toast("Edit cancelled")
+                                     ),
+                                     title: "Edit Profile",
+                                     description: "Update profile information",
+                                     width: Size.Fraction(1/2f)
+                                 )
                             | new Button("Delete").Variant(ButtonVariant.Destructive)
                                 .HandleClick(new Action(() => DeleteProfile(selectedProfile.Value)).ToEventHandler<Button>()))
                     ).Height(Size.Full())
