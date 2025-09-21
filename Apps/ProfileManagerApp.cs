@@ -22,11 +22,13 @@ public class ProfileManagerRootView : ViewBase
         var client = UseService<IClientProvider>();
         var blades = this.UseContext<IBladeController>();
 
-        // Load profiles on startup
+        // Load profiles on startup and whenever component mounts
         UseEffect(() =>
         {
             LoadProfiles();
         }, []);
+
+        // Note: Profiles will be reloaded when component re-renders
 
         // Filter profiles when search term changes
         UseEffect(() =>

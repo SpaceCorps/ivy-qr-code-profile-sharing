@@ -27,6 +27,12 @@ public class ProfileListBlade : ViewBase
             }
         }, []);
 
+        // Update profiles when they change from parent
+        if (_profiles != null && profiles.Value != _profiles)
+        {
+            profiles.Value = _profiles;
+        }
+
         void LoadProfiles()
         {
             loading.Value = true;
