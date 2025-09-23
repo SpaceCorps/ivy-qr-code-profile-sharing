@@ -11,9 +11,14 @@ var server = new Server(new ServerArgs
     Browse = true,
     Silent = true
 });
+
+server.SetMetaTitle("Ivy QR Code Profile Sharing");
+server.SetMetaDescription("A powerful web application for creating and sharing QR code profiles built with Ivy framework");
+
 #if DEBUG
 server.UseHotReload();
 // server.UseHttpRedirection();
+server.UseContentBuilder(new CustomContentBuilder());
 #endif
 
 // Create and configure IConfiguration manually
