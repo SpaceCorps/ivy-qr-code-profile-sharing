@@ -15,11 +15,30 @@ var server = new Server(new ServerArgs
 server.UseHotReload();
 #endif
 
-// QR Code Service (Singleton - stateless, can be shared)
-server.Services.AddSingleton<IQrCodeService, QrCodeService>();
+// Create and configure IConfiguration manually
+var configurationBuilder = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: true)
+    .AddEnvironmentVariables()
+    .AddUserSecrets<Program>();
 
-// Profile Storage Service (Singleton - maintains state across requests)
+var configuration = configurationBuilder.Build();
+// Configure the underlying ASP.NET Core builder
+server.UseBuilder(builder =>
+{
+    // Use the same configuration
+    builder.Configuration.AddConfiguration(configuration);
+});
+
+// Register services in the correct order
+// 1. First register IConfiguration (no dependencies)
+server.Services.AddSingleton<IConfiguration>(configuration);
+
+// 2. Register other services
+server.Services.AddSingleton<IQrCodeService, QrCodeService>();
 server.Services.AddSingleton<IProfileStorage, ProfileStorage>();
+
+// 3. Register AppConfigurationService (depends on IConfiguration)
+server.Services.AddSingleton<IAppConfigurationService, AppConfigurationService>();
 
 // server.AddAppsFromAssembly();
 

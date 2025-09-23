@@ -21,6 +21,7 @@ public class ProfileApp : ViewBase
         var profile = UseState(() => new ProfileModel("", "", "", null, null, null));
         var qrCodeService = UseService<IQrCodeService>(); // Use dependency injection
         var profileStorage = UseService<IProfileStorage>(); // Use dependency injection
+        var configService = UseService<IAppConfigurationService>(); // Use configuration service
         var qrCodeBase64 = UseState(() => "");
         var profileSubmitted = UseState(() => false);
         var createdProfile = UseState(() => (Profile?)null);
@@ -75,14 +76,15 @@ public class ProfileApp : ViewBase
                     
                     createdProfile.Value = profileStorage.Create(newProfile);
                     
-                    // Generate QR code for the created profile
+                    // Generate QR code for the created profile using configured size
                     qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
                         createdProfile.Value.FirstName,
                         createdProfile.Value.LastName,
                         createdProfile.Value.Email,
                         createdProfile.Value.Phone,
                         createdProfile.Value.LinkedIn,
-                        createdProfile.Value.GitHub
+                        createdProfile.Value.GitHub,
+                        configService.QrCodeSize // Use configured QR code size
                     );
                     profileSubmitted.Value = true;
                 }
@@ -125,7 +127,7 @@ public class ProfileApp : ViewBase
                 :
                 Layout.Vertical().Gap(6)
                 | (Layout.Center()
-                    | Text.H2("Welcome to Profile Creator"))
+                    | Text.H2($"Welcome to {configService.AppName}"))
                 | Text.Block("Fill out the form in the sidebar to create your shareable profile QR code.")
                 | Text.Block("Once you submit the form, your QR code will appear here in the main content area.")
             )
