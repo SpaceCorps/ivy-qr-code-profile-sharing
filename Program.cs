@@ -13,6 +13,7 @@ var server = new Server(new ServerArgs
 });
 #if DEBUG
 server.UseHotReload();
+// server.UseHttpRedirection();
 #endif
 
 // Create and configure IConfiguration manually
