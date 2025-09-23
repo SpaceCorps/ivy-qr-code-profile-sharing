@@ -1,4 +1,5 @@
 using IvyQrCodeProfileSharing.Apps;
+using IvyQrCodeProfileSharing.Services;
 using System.Globalization;
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
@@ -13,6 +14,13 @@ var server = new Server(new ServerArgs
 #if DEBUG
 server.UseHotReload();
 #endif
+
+// QR Code Service (Singleton - stateless, can be shared)
+server.Services.AddSingleton<IQrCodeService, QrCodeService>();
+
+// Profile Storage Service (Singleton - maintains state across requests)
+server.Services.AddSingleton<IProfileStorage, ProfileStorage>();
+
 // server.AddAppsFromAssembly();
 
 // Profile Creator App

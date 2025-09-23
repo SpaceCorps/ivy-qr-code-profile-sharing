@@ -2,13 +2,13 @@ using IvyQrCodeProfileSharing.Models;
 
 namespace IvyQrCodeProfileSharing.Services;
 
-public static class ProfileStorage
+public class ProfileStorage : IProfileStorage
 {
     private static readonly List<Profile> _profiles = new();
     private static int _nextId = 1;
     private static readonly object _lock = new();
 
-    public static List<Profile> GetAll()
+    public List<Profile> GetAll()
     {
         lock (_lock)
         {
@@ -16,7 +16,7 @@ public static class ProfileStorage
         }
     }
 
-    public static Profile? GetById(int id)
+    public Profile? GetById(int id)
     {
         lock (_lock)
         {
@@ -24,7 +24,7 @@ public static class ProfileStorage
         }
     }
 
-    public static Profile? GetByEmail(string email)
+    public Profile? GetByEmail(string email)
     {
         lock (_lock)
         {
@@ -33,7 +33,7 @@ public static class ProfileStorage
         }
     }
 
-    public static Profile Create(Profile profile)
+    public Profile Create(Profile profile)
     {
         lock (_lock)
         {
@@ -46,7 +46,7 @@ public static class ProfileStorage
         }
     }
 
-    public static Profile Update(Profile profile)
+    public Profile Update(Profile profile)
     {
         lock (_lock)
         {
@@ -68,7 +68,7 @@ public static class ProfileStorage
         }
     }
 
-    public static bool Delete(int id)
+    public bool Delete(int id)
     {
         lock (_lock)
         {
@@ -83,7 +83,7 @@ public static class ProfileStorage
         }
     }
 
-    public static List<Profile> Search(string searchTerm)
+    public List<Profile> Search(string searchTerm)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
         {

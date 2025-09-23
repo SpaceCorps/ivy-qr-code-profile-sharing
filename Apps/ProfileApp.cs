@@ -19,7 +19,8 @@ public class ProfileApp : ViewBase
     public override object? Build()
     {
         var profile = UseState(() => new ProfileModel("", "", "", null, null, null));
-        var qrCodeService = new QrCodeService();
+        var qrCodeService = UseService<IQrCodeService>(); // Use dependency injection
+        var profileStorage = UseService<IProfileStorage>(); // Use dependency injection
         var qrCodeBase64 = UseState(() => "");
         var profileSubmitted = UseState(() => false);
         var createdProfile = UseState(() => (Profile?)null);
@@ -54,7 +55,7 @@ public class ProfileApp : ViewBase
                 try
                 {
                     // Check if email already exists
-                    var existingProfile = ProfileStorage.GetByEmail(profile.Value.Email);
+                    var existingProfile = profileStorage.GetByEmail(profile.Value.Email);
                     if (existingProfile != null)
                     {
                         // Show error or handle duplicate email
@@ -72,7 +73,7 @@ public class ProfileApp : ViewBase
                         GitHub = profile.Value.GitHub
                     };
                     
-                    createdProfile.Value = ProfileStorage.Create(newProfile);
+                    createdProfile.Value = profileStorage.Create(newProfile);
                     
                     // Generate QR code for the created profile
                     qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
