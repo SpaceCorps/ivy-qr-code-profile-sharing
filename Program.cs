@@ -1,21 +1,51 @@
 using IvyQrCodeProfileSharing.Apps;
-using System.Globalization;
+using IvyQrCodeProfileSharing.Services;
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
 // Custom configuration
 var server = new Server(new ServerArgs
 {
-    Port = 8080,
     Verbose = false,
-    Browse = true,
+    Browse = false,
     Silent = true
 });
+
+server.SetMetaTitle("Ivy QR Code Profile Sharing");
+server.SetMetaDescription("A powerful web application for creating and sharing QR code profiles built with Ivy framework");
+
 #if DEBUG
 server.UseHotReload();
+server.UseContentBuilder(new CustomContentBuilder());
 #endif
-server.AddAppsFromAssembly();
 
-// // Profile Creator App
+// Create and configure IConfiguration manually
+var configurationBuilder = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: true)
+    .AddEnvironmentVariables()
+    .AddUserSecrets<Program>();
+
+var configuration = configurationBuilder.Build();
+// Configure the underlying ASP.NET Core builder
+server.UseBuilder(builder =>
+{
+    // Use the same configuration
+    builder.Configuration.AddConfiguration(configuration);
+});
+
+// Register services in the correct order
+// 1. First register IConfiguration (no dependencies)
+server.Services.AddSingleton<IConfiguration>(configuration);
+
+// 2. Register other services
+server.Services.AddSingleton<IQrCodeService, QrCodeService>();
+server.Services.AddSingleton<IProfileStorage, ProfileStorage>();
+
+// 3. Register AppConfigurationService (depends on IConfiguration)
+server.Services.AddSingleton<IAppConfigurationService, AppConfigurationService>();
+
+ server.AddAppsFromAssembly();
+
+// Profile Creator App
 // server.AddApp(new AppDescriptor
 // {
 //     Id = "profile-creator",

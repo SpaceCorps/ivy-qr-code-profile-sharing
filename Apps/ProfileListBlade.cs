@@ -17,6 +17,7 @@ public class ProfileListBlade : ViewBase
         var profiles = UseState(() => _profiles ?? new List<Profile>());
         var loading = UseState(() => false);
         var client = UseService<IClientProvider>();
+        var profileStorage = UseService<IProfileStorage>(); // Use dependency injection
 
         // Load profiles when blade loads (only if not provided in constructor)
         UseEffect(() =>
@@ -38,7 +39,7 @@ public class ProfileListBlade : ViewBase
             loading.Value = true;
             try
             {
-                profiles.Value = ProfileStorage.GetAll();
+                profiles.Value = profileStorage.GetAll();
             }
             finally
             {

@@ -19,6 +19,7 @@ public class EditProfileSheet : ViewBase
     public override object? Build()
     {
         var client = UseService<IClientProvider>();
+        var profileStorage = UseService<IProfileStorage>(); // Use dependency injection
         
         // Create a copy of the profile for editing
         var editProfile = UseState(() => new Profile
@@ -66,7 +67,7 @@ public class EditProfileSheet : ViewBase
                     // Check if email is being changed and if the new email already exists
                     if (_profile.Email != editProfile.Value.Email)
                     {
-                        var existingProfile = ProfileStorage.GetByEmail(editProfile.Value.Email);
+                        var existingProfile = profileStorage.GetByEmail(editProfile.Value.Email);
                         if (existingProfile != null)
                         {
                             client.Toast("A profile with this email already exists!");

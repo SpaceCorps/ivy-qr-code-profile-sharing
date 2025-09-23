@@ -15,6 +15,7 @@ public class ProfileDetailSheet : ViewBase
     public override object? Build()
     {
         var client = UseService<IClientProvider>();
+        var profileStorage = UseService<IProfileStorage>(); // Use dependency injection
         var qrCodeBase64 = UseState(() => "");
         var loading = UseState(() => false);
 
@@ -50,7 +51,7 @@ public class ProfileDetailSheet : ViewBase
             loading.Value = true;
             try
             {
-                var success = ProfileStorage.Delete(_profile.Id);
+                var success = profileStorage.Delete(_profile.Id);
                 if (success)
                 {
                     client.Toast("Profile deleted successfully!");
@@ -74,7 +75,7 @@ public class ProfileDetailSheet : ViewBase
         {
             try
             {
-                ProfileStorage.Update(updatedProfile);
+                profileStorage.Update(updatedProfile);
                 client.Toast("Profile updated successfully!");
                 
                 // Regenerate QR code with updated profile

@@ -21,6 +21,7 @@ public class ProfileManagerRootView : ViewBase
         var searchTerm = UseState(() => "");
         var client = UseService<IClientProvider>();
         var blades = this.UseContext<IBladeController>();
+        var profileStorage = UseService<IProfileStorage>(); // Use dependency injection
 
         // Load profiles on startup and whenever component mounts
         UseEffect(() =>
@@ -40,7 +41,7 @@ public class ProfileManagerRootView : ViewBase
         {
             try
             {
-                profiles.Value = ProfileStorage.GetAll();
+                profiles.Value = profileStorage.GetAll();
             }
             catch (Exception ex)
             {
