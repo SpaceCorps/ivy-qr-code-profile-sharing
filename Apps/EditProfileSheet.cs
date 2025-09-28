@@ -7,13 +7,11 @@ public class EditProfileSheet : ViewBase
 {
     private readonly Profile _profile;
     private readonly Action<Profile> _onSave;
-    private readonly Action _onCancel;
 
-    public EditProfileSheet(Profile profile, Action<Profile> onSave, Action onCancel)
+    public EditProfileSheet(Profile profile, Action<Profile> onSave)
     {
         _profile = profile;
         _onSave = onSave;
-        _onCancel = onCancel;
     }
 
     public override object? Build()
@@ -102,15 +100,12 @@ public class EditProfileSheet : ViewBase
             Layout.Horizontal().Gap(2)
                 | new Button("Save").Variant(ButtonVariant.Primary)
                     .HandleClick(HandleSave)
-                    .Loading(loading).Disabled(loading)
-                | new Button("Cancel").Variant(ButtonVariant.Outline)
-                    .HandleClick(_onCancel),
+                    .Loading(loading).Disabled(loading),
             new Card(
                 Layout.Vertical().Gap(4).Padding(2)
                 | Text.H3($"Edit Profile - {_profile.FullName}")
                 | new Card(
                     Layout.Vertical().Gap(2).Padding(2)
-                    | Text.H4("Profile Information (Read-Only)")
                     | Layout.Horizontal().Gap(4)
                         | Layout.Vertical().Gap(1)
                             | Text.Label("Full Name")

@@ -92,8 +92,7 @@ public class ProfileDetailSheet : ViewBase
                     .WithSheet(
                         () => new EditProfileSheet(
                             _profile,
-                            HandleProfileUpdate,
-                            () => client.Toast("Edit cancelled")
+                            HandleProfileUpdate
                         ),
                         title: "Edit Profile",
                         description: "Update profile information",
@@ -101,15 +100,11 @@ public class ProfileDetailSheet : ViewBase
                     )
                 | new Button("Delete").Variant(ButtonVariant.Destructive)
                     .HandleClick(DeleteProfile)
-                    .Loading(loading.Value)
-                | new Button("Close").Variant(ButtonVariant.Outline)
-                    .HandleClick(() => { }),
+                    .Loading(loading.Value),
             new Card(
                 Layout.Vertical().Gap(6).Padding(2)
-                | Text.H3($"Profile Details - {_profile.FullName}")
                 | new Card(
                     Layout.Vertical().Gap(2).Padding(2)
-                    | Text.H4("Profile Information")
                     | Layout.Vertical().Gap(2)
                         | Layout.Horizontal().Gap(4)
                             | Layout.Vertical().Gap(1)
