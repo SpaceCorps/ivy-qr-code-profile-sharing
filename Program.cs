@@ -19,13 +19,8 @@ server.UseBuilder(builder =>
     builder.Configuration.AddJsonFile("appsettings.json");
     builder.Configuration.AddEnvironmentVariables();
     builder.Configuration.AddUserSecrets<Program>();
-    builder.Services.AddDbContext<DatabaseContext>(
-        options => {
-            options.UseSqlServer(
-                builder.Configuration.GetConnectionString("DefaultConnection")
-            );
-        }
-    );
+    builder.Services.AddDbContext<DatabaseContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 });
 
 var chromeSettings = new ChromeSettings().DefaultApp<ProfileApp>().UseTabs(preventDuplicates: true);
