@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using IvyQrCodeProfileSharing.Data;
+using IvyQrCodeProfileSharing.Db;
 using IvyQrCodeProfileSharing.Models;
 
 namespace IvyQrCodeProfileSharing.Repositories;
 
 public class ProfileRepository : IProfileRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly DatabaseContext _context;
 
-    public ProfileRepository(ApplicationDbContext context)
+    public ProfileRepository(DatabaseContext context)
     {
         _context = context;
     }
