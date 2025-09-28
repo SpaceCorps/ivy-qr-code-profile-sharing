@@ -92,8 +92,7 @@ public class ProfileDetailSheet : ViewBase
                     .WithSheet(
                         () => new EditProfileSheet(
                             _profile,
-                            HandleProfileUpdate,
-                            () => client.Toast("Edit cancelled")
+                            HandleProfileUpdate
                         ),
                         title: "Edit Profile",
                         description: "Update profile information",
