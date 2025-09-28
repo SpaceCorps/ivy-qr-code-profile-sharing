@@ -113,14 +113,6 @@ public class ProfileApp : ViewBase
                     Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
                 ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70))
                 | Text.Block($"Profile ID: {createdProfile.Value.Id} | Created: {createdProfile.Value.CreatedAt:yyyy-MM-dd HH:mm}"))
-                | (Layout.Horizontal().Align(Align.Center)
-                    | new Button("Create Another Profile").HandleClick(() =>
-                    {
-                        profile.Value = new ProfileModel("", "", "", null, null, null);
-                        qrCodeBase64.Value = "";
-                        profileSubmitted.Value = false;
-                        createdProfile.Value = null;
-                    }))
                 :
                 Layout.Vertical().Gap(6)
                 | (Layout.Center()
