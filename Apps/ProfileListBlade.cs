@@ -1,5 +1,6 @@
 using IvyQrCodeProfileSharing.Models;
 using IvyQrCodeProfileSharing.Services;
+using IvyQrCodeProfileSharing.Repositories;
 
 namespace IvyQrCodeProfileSharing.Apps;
 
@@ -17,6 +18,7 @@ public class ProfileListBlade : ViewBase
         var profiles = UseState(() => _profiles ?? new List<Profile>());
         var loading = UseState(() => false);
         var client = UseService<IClientProvider>();
+        var profileRepository = UseService<IProfileRepository>();
 
         // Load profiles when blade loads (only if not provided in constructor)
         UseEffect(() =>
@@ -33,12 +35,12 @@ public class ProfileListBlade : ViewBase
             profiles.Value = _profiles;
         }
 
-        void LoadProfiles()
+        async void LoadProfiles()
         {
             loading.Value = true;
             try
             {
-                profiles.Value = ProfileStorage.GetAll();
+                profiles.Value = await profileRepository.GetAllAsync();
             }
             finally
             {

@@ -1,5 +1,6 @@
 using IvyQrCodeProfileSharing.Models;
 using IvyQrCodeProfileSharing.Services;
+using IvyQrCodeProfileSharing.Repositories;
 
 namespace IvyQrCodeProfileSharing.Apps;
 
@@ -15,6 +16,7 @@ public class ProfileDetailSheet : ViewBase
     public override object? Build()
     {
         var client = UseService<IClientProvider>();
+        var profileRepository = UseService<IProfileRepository>();
         var qrCodeBase64 = UseState(() => "");
         var loading = UseState(() => false);
 
@@ -45,12 +47,12 @@ public class ProfileDetailSheet : ViewBase
             }
         }
 
-        void DeleteProfile()
+        async void DeleteProfile()
         {
             loading.Value = true;
             try
             {
-                var success = ProfileStorage.Delete(_profile.Id);
+                var success = await profileRepository.DeleteAsync(_profile.Id);
                 if (success)
                 {
                     client.Toast("Profile deleted successfully!");
@@ -70,11 +72,11 @@ public class ProfileDetailSheet : ViewBase
             }
         }
 
-        void HandleProfileUpdate(Profile updatedProfile)
+        async void HandleProfileUpdate(Profile updatedProfile)
         {
             try
             {
-                ProfileStorage.Update(updatedProfile);
+                await profileRepository.UpdateAsync(updatedProfile);
                 client.Toast("Profile updated successfully!");
                 
                 // Regenerate QR code with updated profile

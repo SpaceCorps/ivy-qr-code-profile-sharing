@@ -1,5 +1,6 @@
 using IvyQrCodeProfileSharing.Models;
 using IvyQrCodeProfileSharing.Services;
+using IvyQrCodeProfileSharing.Repositories;
 
 namespace IvyQrCodeProfileSharing.Apps;
 
@@ -20,6 +21,7 @@ public class ProfileManagerRootView : ViewBase
         var filteredProfiles = UseState(() => new List<Profile>());
         var searchTerm = UseState(() => "");
         var client = UseService<IClientProvider>();
+        var profileRepository = UseService<IProfileRepository>();
         var blades = this.UseContext<IBladeController>();
 
         // Load profiles on startup and whenever component mounts
@@ -36,11 +38,11 @@ public class ProfileManagerRootView : ViewBase
             FilterProfiles();
         }, [searchTerm, profiles]);
 
-        void LoadProfiles()
+        async void LoadProfiles()
         {
             try
             {
-                profiles.Value = ProfileStorage.GetAll();
+                profiles.Value = await profileRepository.GetAllAsync();
             }
             catch (Exception ex)
             {

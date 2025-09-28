@@ -1,5 +1,6 @@
 using IvyQrCodeProfileSharing.Models;
 using IvyQrCodeProfileSharing.Services;
+using IvyQrCodeProfileSharing.Repositories;
 
 namespace IvyQrCodeProfileSharing.Apps;
 
@@ -17,6 +18,7 @@ public class EditProfileSheet : ViewBase
     public override object? Build()
     {
         var client = UseService<IClientProvider>();
+        var profileRepository = UseService<IProfileRepository>();
         
         // Create a copy of the profile for editing
         var editProfile = UseState(() => new Profile
@@ -64,7 +66,7 @@ public class EditProfileSheet : ViewBase
                     // Check if email is being changed and if the new email already exists
                     if (_profile.Email != editProfile.Value.Email)
                     {
-                        var existingProfile = ProfileStorage.GetByEmail(editProfile.Value.Email);
+                        var existingProfile = await profileRepository.GetByEmailAsync(editProfile.Value.Email);
                         if (existingProfile != null)
                         {
                             client.Toast("A profile with this email already exists!");
