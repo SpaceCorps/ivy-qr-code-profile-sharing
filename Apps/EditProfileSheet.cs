@@ -101,10 +101,10 @@ public class EditProfileSheet : ViewBase
         return new FooterLayout(
             Layout.Horizontal().Gap(2)
                 | new Button("Save").Variant(ButtonVariant.Primary)
-                    .HandleClick(new Action(HandleSave).ToEventHandler<Button>())
+                    .HandleClick(HandleSave)
                     .Loading(loading).Disabled(loading)
                 | new Button("Cancel").Variant(ButtonVariant.Outline)
-                    .HandleClick(new Action(_onCancel).ToEventHandler<Button>()),
+                    .HandleClick(_onCancel),
             new Card(
                 Layout.Vertical().Gap(4).Padding(2)
                 | Text.H3($"Edit Profile - {_profile.FullName}")

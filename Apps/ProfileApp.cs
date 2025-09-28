@@ -96,7 +96,7 @@ public class ProfileApp : ViewBase
         var formContent = Layout.Vertical().Gap(6).Padding(2)
             | formView
             | (Layout.Horizontal()
-                | new Button("Create Profile").HandleClick(new Action(HandleSubmit).ToEventHandler<Button>())
+                | new Button("Create Profile").HandleClick(HandleSubmit)
                     .Loading(loading).Disabled(loading)
                 | validationView
                 );
@@ -114,13 +114,13 @@ public class ProfileApp : ViewBase
                 ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70))
                 | Text.Block($"Profile ID: {createdProfile.Value.Id} | Created: {createdProfile.Value.CreatedAt:yyyy-MM-dd HH:mm}"))
                 | (Layout.Horizontal().Align(Align.Center)
-                    | new Button("Create Another Profile").HandleClick(new Action(() =>
+                    | new Button("Create Another Profile").HandleClick(() =>
                     {
                         profile.Value = new ProfileModel("", "", "", null, null, null);
                         qrCodeBase64.Value = "";
                         profileSubmitted.Value = false;
                         createdProfile.Value = null;
-                    }).ToEventHandler<Button>()))
+                    }))
                 :
                 Layout.Vertical().Gap(6)
                 | (Layout.Center()

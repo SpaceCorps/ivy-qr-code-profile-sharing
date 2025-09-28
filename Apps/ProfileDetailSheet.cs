@@ -100,10 +100,10 @@ public class ProfileDetailSheet : ViewBase
                         width: Size.Fraction(1 / 2f)
                     )
                 | new Button("Delete").Variant(ButtonVariant.Destructive)
-                    .HandleClick(new Action(DeleteProfile).ToEventHandler<Button>())
+                    .HandleClick(DeleteProfile)
                     .Loading(loading.Value)
                 | new Button("Close").Variant(ButtonVariant.Outline)
-                    .HandleClick(new Action(() => { }).ToEventHandler<Button>()),
+                    .HandleClick(() => { }),
             new Card(
                 Layout.Vertical().Gap(6).Padding(2)
                 | Text.H3($"Profile Details - {_profile.FullName}")
