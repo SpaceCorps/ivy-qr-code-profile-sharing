@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IvyQrCodeProfileSharing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250928140737_InitialCreate")]
+    [Migration("20250928143307_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

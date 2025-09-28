@@ -11,7 +11,7 @@ var server = new Server();
 
 // Configure services
 server.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer("Server=localhost,1433;Database=IvyQrCodeProfileSharing;User Id=sa;Password=Password_2_Change_4_Real_Cases_&;TrustServerCertificate=true;"));
+    options.UseSqlServer("Server=179.61.190.43,1433;Database=IvyQrCodeProfileSharing;User Id=sa;Password=Password_2_Change_4_RealCases%26;TrustServerCertificate=true;"));
 
 server.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
