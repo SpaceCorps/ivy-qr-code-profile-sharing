@@ -2,16 +2,25 @@ using IvyQrCodeProfileSharing.Apps;
 using IvyQrCodeProfileSharing.Data;
 using IvyQrCodeProfileSharing.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Globalization;
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
+
+// Build configuration
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddUserSecrets<Program>()
+    .AddEnvironmentVariables()
+    .Build();
 
 // Custom configuration
 var server = new Server();
 
 // Configure services
 server.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer("Server=179.61.190.43,1433;Database=IvyQrCodeProfileSharing;User Id=sa;Password=Password_2_Change_4_RealCases%26;TrustServerCertificate=true;"));
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
 server.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
