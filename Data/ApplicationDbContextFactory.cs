@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace IvyQrCodeProfileSharing.Data;
 
@@ -7,8 +8,16 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
 {
     public ApplicationDbContext CreateDbContext(string[] args)
     {
+        // Build configuration the same way as in Program.cs
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddUserSecrets("17bb6ff1-6c17-4fc0-b294-5427dfea29f3")
+            .AddEnvironmentVariables()
+            .Build();
+
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-        optionsBuilder.UseSqlServer("Server=179.61.190.43,1433;Database=IvyQrCodeProfileSharing;User Id=sa;Password=Password_2_Change_4_RealCases%26;TrustServerCertificate=true;");
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 
         return new ApplicationDbContext(optionsBuilder.Options);
     }

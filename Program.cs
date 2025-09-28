@@ -18,6 +18,8 @@ var configuration = new ConfigurationBuilder()
 // Custom configuration
 var server = new Server();
 
+Console.WriteLine(configuration.GetConnectionString("DefaultConnection"));
+
 // Configure services
 server.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
