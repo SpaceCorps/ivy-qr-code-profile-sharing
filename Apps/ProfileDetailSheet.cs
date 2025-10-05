@@ -17,6 +17,7 @@ public class ProfileDetailSheet : ViewBase
     {
         var client = UseService<IClientProvider>();
         var profileRepository = UseService<IProfileRepository>();
+        var qrCodeService = UseService<IQrCodeService>();
         var qrCodeBase64 = UseState(() => "");
         var loading = UseState(() => false);
 
@@ -31,7 +32,6 @@ public class ProfileDetailSheet : ViewBase
             loading.Value = true;
             try
             {
-                var qrCodeService = new QrCodeService();
                 qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
                     _profile.FirstName,
                     _profile.LastName,

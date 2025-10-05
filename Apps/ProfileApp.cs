@@ -20,7 +20,7 @@ public class ProfileApp : ViewBase
     public override object? Build()
     {
         var profile = UseState(() => new ProfileModel("", "", "", null, null, null));
-        var qrCodeService = new QrCodeService();
+        var qrCodeService = UseService<IQrCodeService>();
         var profileRepository = UseService<IProfileRepository>();
         var qrCodeBase64 = UseState(() => "");
         var profileSubmitted = UseState(() => false);
@@ -51,19 +51,42 @@ public class ProfileApp : ViewBase
 
         async void HandleSubmit()
         {
-            if (await onSubmit())
+            Console.WriteLine($"HandleSubmit - Start");
+            
+            try 
             {
-                try
+                Console.WriteLine($"HandleSubmit - Checking form validation");
+                if (await onSubmit())
                 {
-                    // Check if email already exists
+                    Console.WriteLine($"HandleSubmit - Form validation passed");
+                    
+                    if (profileRepository == null)
+                    {
+                        Console.WriteLine($"HandleSubmit - profileRepository is null!");
+                        throw new InvalidOperationException("Profile repository is null");
+                    }
+                    
+                    if (qrCodeService == null)
+                    {
+                        Console.WriteLine($"HandleSubmit - qrCodeService is null!");
+                        throw new InvalidOperationException("QR code service is null");
+                    }
+                    
+                    if (profile.Value == null)
+                    {
+                        Console.WriteLine($"HandleSubmit - profile.Value is null!");
+                        throw new InvalidOperationException("Profile value is null");
+                    }
+                    
+                    Console.WriteLine($"HandleSubmit - Checking for existing email: {profile.Value.Email}");
                     var existingProfile = await profileRepository.GetByEmailAsync(profile.Value.Email);
                     if (existingProfile != null)
                     {
-                        // Show error or handle duplicate email
+                        Console.WriteLine($"HandleSubmit - Email already exists, aborting");
                         return;
                     }
 
-                    // Create profile in storage
+                    Console.WriteLine($"HandleSubmit - Creating new profile object");
                     var newProfile = new Profile
                     {
                         FirstName = profile.Value.FirstName,
@@ -74,7 +97,15 @@ public class ProfileApp : ViewBase
                         GitHub = profile.Value.GitHub
                     };
                     
+                    Console.WriteLine($"HandleSubmit - Calling repository.CreateAsync");
                     createdProfile.Value = await profileRepository.CreateAsync(newProfile);
+                    
+                    Console.WriteLine($"HandleSubmit - Profile created successfully, generating QR code");
+                    if (createdProfile.Value == null)
+                    {
+                        Console.WriteLine($"HandleSubmit - createdProfile.Value is null after creation!");
+                        throw new InvalidOperationException("Created profile is null");
+                    }
                     
                     // Generate QR code for the created profile
                     qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
@@ -85,12 +116,19 @@ public class ProfileApp : ViewBase
                         createdProfile.Value.LinkedIn,
                         createdProfile.Value.GitHub
                     );
+                    
+                    Console.WriteLine($"HandleSubmit - Success, setting profileSubmitted = true");
                     profileSubmitted.Value = true;
                 }
-                catch (Exception ex)
+                else 
                 {
-                    Console.WriteLine($"Error creating profile: {ex.Message}");
+                    Console.WriteLine($"HandleSubmit - Form validation failed");
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating profile: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
             }
         }
 

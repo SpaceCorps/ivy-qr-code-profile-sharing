@@ -19,6 +19,7 @@ public class ProfileListBlade : ViewBase
         var loading = UseState(() => false);
         var client = UseService<IClientProvider>();
         var profileRepository = UseService<IProfileRepository>();
+        var qrCodeService = UseService<IQrCodeService>();
 
         // Load profiles when blade loads (only if not provided in constructor)
         UseEffect(() =>
@@ -54,7 +55,6 @@ public class ProfileListBlade : ViewBase
         {
             try
             {
-                var qrCodeService = new QrCodeService();
                 return qrCodeService.GenerateVCardQrCodeAsBase64(
                     profile.FirstName,
                     profile.LastName,
