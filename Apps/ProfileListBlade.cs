@@ -19,6 +19,7 @@ public class ProfileListBlade : ViewBase
         var loading = UseState(() => false);
         var client = UseService<IClientProvider>();
         var profileRepository = UseService<IProfileRepository>();
+        var qrCodeService = UseService<IQrCodeService>();
 
         // Load profiles when blade loads (only if not provided in constructor)
         UseEffect(() =>
@@ -52,23 +53,14 @@ public class ProfileListBlade : ViewBase
 
         string GenerateQrCodeForProfile(Profile profile)
         {
-            try
-            {
-                var qrCodeService = new QrCodeService();
-                return qrCodeService.GenerateVCardQrCodeAsBase64(
-                    profile.FirstName,
-                    profile.LastName,
-                    profile.Email,
-                    profile.Phone,
-                    profile.LinkedIn,
-                    profile.GitHub
-                );
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error generating QR code for {profile.FullName}: {ex.Message}");
-                return ""; // Return empty string on error
-            }
+            return qrCodeService.GenerateVCardQrCodeAsBase64(
+                profile.FirstName,
+                profile.LastName,
+                profile.Email,
+                profile.Phone,
+                profile.LinkedIn,
+                profile.GitHub
+            );
         }
 
         return Layout.Vertical().Gap(6).Padding(2)

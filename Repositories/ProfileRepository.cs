@@ -37,10 +37,11 @@ public class ProfileRepository : IProfileRepository
     {
         profile.CreatedAt = DateTime.UtcNow;
         profile.UpdatedAt = DateTime.UtcNow;
-        
+
         _context.Profiles.Add(profile);
+
         await _context.SaveChangesAsync();
-        
+
         return profile;
     }
 
@@ -48,7 +49,7 @@ public class ProfileRepository : IProfileRepository
     {
         var existingProfile = await _context.Profiles
             .FirstOrDefaultAsync(p => p.Id == profile.Id);
-            
+
         if (existingProfile == null)
         {
             throw new ArgumentException($"Profile with ID {profile.Id} not found");
@@ -70,7 +71,7 @@ public class ProfileRepository : IProfileRepository
     {
         var profile = await _context.Profiles
             .FirstOrDefaultAsync(p => p.Id == id);
-            
+
         if (profile == null)
         {
             return false;
@@ -89,7 +90,7 @@ public class ProfileRepository : IProfileRepository
         }
 
         var searchLower = searchTerm.ToLower();
-        
+
         return await _context.Profiles
             .Where(p =>
                 p.FirstName.ToLower().Contains(searchLower) ||

@@ -20,7 +20,7 @@ public class ProfileApp : ViewBase
     public override object? Build()
     {
         var profile = UseState(() => new ProfileModel("", "", "", null, null, null));
-        var qrCodeService = new QrCodeService();
+        var qrCodeService = UseService<IQrCodeService>();
         var profileRepository = UseService<IProfileRepository>();
         var qrCodeBase64 = UseState(() => "");
         var profileSubmitted = UseState(() => false);
@@ -51,46 +51,59 @@ public class ProfileApp : ViewBase
 
         async void HandleSubmit()
         {
+
             if (await onSubmit())
             {
-                try
-                {
-                    // Check if email already exists
-                    var existingProfile = await profileRepository.GetByEmailAsync(profile.Value.Email);
-                    if (existingProfile != null)
-                    {
-                        // Show error or handle duplicate email
-                        return;
-                    }
 
-                    // Create profile in storage
-                    var newProfile = new Profile
-                    {
-                        FirstName = profile.Value.FirstName,
-                        LastName = profile.Value.LastName,
-                        Email = profile.Value.Email,
-                        Phone = profile.Value.Phone,
-                        LinkedIn = profile.Value.LinkedIn,
-                        GitHub = profile.Value.GitHub
-                    };
-                    
-                    createdProfile.Value = await profileRepository.CreateAsync(newProfile);
-                    
-                    // Generate QR code for the created profile
-                    qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
-                        createdProfile.Value.FirstName,
-                        createdProfile.Value.LastName,
-                        createdProfile.Value.Email,
-                        createdProfile.Value.Phone,
-                        createdProfile.Value.LinkedIn,
-                        createdProfile.Value.GitHub
-                    );
-                    profileSubmitted.Value = true;
-                }
-                catch (Exception ex)
+                if (profileRepository == null)
                 {
-                    Console.WriteLine($"Error creating profile: {ex.Message}");
+                    throw new InvalidOperationException("Profile repository is null");
                 }
+
+                if (qrCodeService == null)
+                {
+                    throw new InvalidOperationException("QR code service is null");
+                }
+
+                if (profile.Value == null)
+                {
+                    throw new InvalidOperationException("Profile value is null");
+                }
+
+                var existingProfile = await profileRepository.GetByEmailAsync(profile.Value.Email);
+                if (existingProfile != null)
+                {
+                    return;
+                }
+
+                var newProfile = new Profile
+                {
+                    FirstName = profile.Value.FirstName,
+                    LastName = profile.Value.LastName,
+                    Email = profile.Value.Email,
+                    Phone = profile.Value.Phone,
+                    LinkedIn = profile.Value.LinkedIn,
+                    GitHub = profile.Value.GitHub
+                };
+
+                createdProfile.Value = await profileRepository.CreateAsync(newProfile);
+
+                if (createdProfile.Value == null)
+                {
+                    throw new InvalidOperationException("Created profile is null");
+                }
+
+                // Generate QR code for the created profile
+                qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
+                    createdProfile.Value.FirstName,
+                    createdProfile.Value.LastName,
+                    createdProfile.Value.Email,
+                    createdProfile.Value.Phone,
+                    createdProfile.Value.LinkedIn,
+                    createdProfile.Value.GitHub
+                );
+
+                profileSubmitted.Value = true;
             }
         }
 
