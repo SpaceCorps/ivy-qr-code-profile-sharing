@@ -53,22 +53,14 @@ public class ProfileListBlade : ViewBase
 
         string GenerateQrCodeForProfile(Profile profile)
         {
-            try
-            {
-                return qrCodeService.GenerateVCardQrCodeAsBase64(
-                    profile.FirstName,
-                    profile.LastName,
-                    profile.Email,
-                    profile.Phone,
-                    profile.LinkedIn,
-                    profile.GitHub
-                );
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error generating QR code for {profile.FullName}: {ex.Message}");
-                return ""; // Return empty string on error
-            }
+            return qrCodeService.GenerateVCardQrCodeAsBase64(
+                profile.FirstName,
+                profile.LastName,
+                profile.Email,
+                profile.Phone,
+                profile.LinkedIn,
+                profile.GitHub
+            );
         }
 
         return Layout.Vertical().Gap(6).Padding(2)

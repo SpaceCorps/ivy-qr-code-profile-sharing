@@ -51,84 +51,59 @@ public class ProfileApp : ViewBase
 
         async void HandleSubmit()
         {
-            Console.WriteLine($"HandleSubmit - Start");
-            
-            try 
-            {
-                Console.WriteLine($"HandleSubmit - Checking form validation");
-                if (await onSubmit())
-                {
-                    Console.WriteLine($"HandleSubmit - Form validation passed");
-                    
-                    if (profileRepository == null)
-                    {
-                        Console.WriteLine($"HandleSubmit - profileRepository is null!");
-                        throw new InvalidOperationException("Profile repository is null");
-                    }
-                    
-                    if (qrCodeService == null)
-                    {
-                        Console.WriteLine($"HandleSubmit - qrCodeService is null!");
-                        throw new InvalidOperationException("QR code service is null");
-                    }
-                    
-                    if (profile.Value == null)
-                    {
-                        Console.WriteLine($"HandleSubmit - profile.Value is null!");
-                        throw new InvalidOperationException("Profile value is null");
-                    }
-                    
-                    Console.WriteLine($"HandleSubmit - Checking for existing email: {profile.Value.Email}");
-                    var existingProfile = await profileRepository.GetByEmailAsync(profile.Value.Email);
-                    if (existingProfile != null)
-                    {
-                        Console.WriteLine($"HandleSubmit - Email already exists, aborting");
-                        return;
-                    }
 
-                    Console.WriteLine($"HandleSubmit - Creating new profile object");
-                    var newProfile = new Profile
-                    {
-                        FirstName = profile.Value.FirstName,
-                        LastName = profile.Value.LastName,
-                        Email = profile.Value.Email,
-                        Phone = profile.Value.Phone,
-                        LinkedIn = profile.Value.LinkedIn,
-                        GitHub = profile.Value.GitHub
-                    };
-                    
-                    Console.WriteLine($"HandleSubmit - Calling repository.CreateAsync");
-                    createdProfile.Value = await profileRepository.CreateAsync(newProfile);
-                    
-                    Console.WriteLine($"HandleSubmit - Profile created successfully, generating QR code");
-                    if (createdProfile.Value == null)
-                    {
-                        Console.WriteLine($"HandleSubmit - createdProfile.Value is null after creation!");
-                        throw new InvalidOperationException("Created profile is null");
-                    }
-                    
-                    // Generate QR code for the created profile
-                    qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
-                        createdProfile.Value.FirstName,
-                        createdProfile.Value.LastName,
-                        createdProfile.Value.Email,
-                        createdProfile.Value.Phone,
-                        createdProfile.Value.LinkedIn,
-                        createdProfile.Value.GitHub
-                    );
-                    
-                    Console.WriteLine($"HandleSubmit - Success, setting profileSubmitted = true");
-                    profileSubmitted.Value = true;
-                }
-                else 
-                {
-                    Console.WriteLine($"HandleSubmit - Form validation failed");
-                }
-            }
-            catch (Exception ex)
+            if (await onSubmit())
             {
-                Console.WriteLine($"Error creating profile: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                if (profileRepository == null)
+                {
+                    throw new InvalidOperationException("Profile repository is null");
+                }
+
+                if (qrCodeService == null)
+                {
+                    throw new InvalidOperationException("QR code service is null");
+                }
+
+                if (profile.Value == null)
+                {
+                    throw new InvalidOperationException("Profile value is null");
+                }
+
+                var existingProfile = await profileRepository.GetByEmailAsync(profile.Value.Email);
+                if (existingProfile != null)
+                {
+                    return;
+                }
+
+                var newProfile = new Profile
+                {
+                    FirstName = profile.Value.FirstName,
+                    LastName = profile.Value.LastName,
+                    Email = profile.Value.Email,
+                    Phone = profile.Value.Phone,
+                    LinkedIn = profile.Value.LinkedIn,
+                    GitHub = profile.Value.GitHub
+                };
+
+                createdProfile.Value = await profileRepository.CreateAsync(newProfile);
+
+                if (createdProfile.Value == null)
+                {
+                    throw new InvalidOperationException("Created profile is null");
+                }
+
+                // Generate QR code for the created profile
+                qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
+                    createdProfile.Value.FirstName,
+                    createdProfile.Value.LastName,
+                    createdProfile.Value.Email,
+                    createdProfile.Value.Phone,
+                    createdProfile.Value.LinkedIn,
+                    createdProfile.Value.GitHub
+                );
+
+                profileSubmitted.Value = true;
             }
         }
 

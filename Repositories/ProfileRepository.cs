@@ -35,54 +35,21 @@ public class ProfileRepository : IProfileRepository
 
     public async Task<Profile> CreateAsync(Profile profile)
     {
-        try
-        {
-            Console.WriteLine($"ProfileRepository.CreateAsync - Start");
-            
-            if (profile == null)
-            {
-                Console.WriteLine($"ProfileRepository.CreateAsync - Profile is null!");
-                throw new ArgumentNullException(nameof(profile));
-            }
-            
-            if (_context == null)
-            {
-                Console.WriteLine($"ProfileRepository.CreateAsync - Context is null!");
-                throw new InvalidOperationException("Database context is null");
-            }
-            
-            if (_context.Profiles == null)
-            {
-                Console.WriteLine($"ProfileRepository.CreateAsync - Profiles DbSet is null!");
-                throw new InvalidOperationException("Profiles DbSet is null");
-            }
-            
-            Console.WriteLine($"ProfileRepository.CreateAsync - Setting timestamps");
-            profile.CreatedAt = DateTime.UtcNow;
-            profile.UpdatedAt = DateTime.UtcNow;
-            
-            Console.WriteLine($"ProfileRepository.CreateAsync - Adding to context");
-            _context.Profiles.Add(profile);
-            
-            Console.WriteLine($"ProfileRepository.CreateAsync - Saving changes");
-            await _context.SaveChangesAsync();
-            
-            Console.WriteLine($"ProfileRepository.CreateAsync - Success, ID: {profile.Id}");
-            return profile;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"ProfileRepository.CreateAsync - Exception: {ex.Message}");
-            Console.WriteLine($"ProfileRepository.CreateAsync - Stack trace: {ex.StackTrace}");
-            throw;
-        }
+        profile.CreatedAt = DateTime.UtcNow;
+        profile.UpdatedAt = DateTime.UtcNow;
+
+        _context.Profiles.Add(profile);
+
+        await _context.SaveChangesAsync();
+
+        return profile;
     }
 
     public async Task<Profile> UpdateAsync(Profile profile)
     {
         var existingProfile = await _context.Profiles
             .FirstOrDefaultAsync(p => p.Id == profile.Id);
-            
+
         if (existingProfile == null)
         {
             throw new ArgumentException($"Profile with ID {profile.Id} not found");
@@ -104,7 +71,7 @@ public class ProfileRepository : IProfileRepository
     {
         var profile = await _context.Profiles
             .FirstOrDefaultAsync(p => p.Id == id);
-            
+
         if (profile == null)
         {
             return false;
@@ -123,7 +90,7 @@ public class ProfileRepository : IProfileRepository
         }
 
         var searchLower = searchTerm.ToLower();
-        
+
         return await _context.Profiles
             .Where(p =>
                 p.FirstName.ToLower().Contains(searchLower) ||
